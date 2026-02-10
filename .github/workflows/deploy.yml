@@ -33,7 +33,6 @@ jobs:
 
       - name: Deploy to Cloudflare Pages
         env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
           CLOUDFLARE_EMAIL: fruhchen@codazure.ai
-        run: node scripts/deploy-cloudflare.mjs out
+          CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
+        run: npx -y wrangler pages deploy out --project-name=fruhchen-schweiz --branch=main --commit-dirty=true
