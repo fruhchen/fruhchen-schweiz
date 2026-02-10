@@ -27,7 +27,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             {children}
           </div>
         </main>
-        <MobileNav />
+        <MobileNav isAdmin={isAdmin} />
       </div>
     </AuthGuard>
   );

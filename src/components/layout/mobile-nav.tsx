@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { Icon } from '@/components/ui/icon';
 import { icons } from 'lucide-react';
 
-const MOBILE_NAV_ITEMS = [
+const PARENT_NAV = [
   { href: '/dashboard', label: 'Home', icon: 'LayoutDashboard' },
   { href: '/journal', label: 'Tagebuch', icon: 'BookHeart' },
   { href: '/chat', label: 'Chat', icon: 'MessageCircle' },
@@ -14,13 +14,51 @@ const MOBILE_NAV_ITEMS = [
   { href: '/profile', label: 'Profil', icon: 'User' },
 ] as const;
 
-export function MobileNav() {
+const ADMIN_NAV = [
+  { href: '/admin/dashboard', label: 'Dashboard', icon: 'BarChart3' },
+  { href: '/admin/grants', label: 'Stiftungen', icon: 'Landmark' },
+  { href: '/admin/volunteers', label: 'Team', icon: 'UserCheck' },
+  { href: '/admin/time-tracking', label: 'Zeit', icon: 'Timer' },
+  { href: '/profile', label: 'Profil', icon: 'User' },
+] as const;
+
+interface MobileNavProps {
+  isAdmin?: boolean;
+}
+
+export function MobileNav({ isAdmin }: MobileNavProps) {
   const pathname = usePathname();
+  const isOnAdminPage = pathname.startsWith('/admin');
+  const navItems = isAdmin && isOnAdminPage ? ADMIN_NAV : PARENT_NAV;
 
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-xl border-t border-gray-100">
+      {/* Admin toggle bar */}
+      {isAdmin && (
+        <div className="flex border-b border-gray-100">
+          <Link
+            href="/dashboard"
+            className={cn(
+              'flex-1 py-1.5 text-[10px] font-semibold text-center transition-colors',
+              !isOnAdminPage ? 'text-brand-600 bg-brand-50' : 'text-gray-400'
+            )}
+          >
+            Eltern
+          </Link>
+          <Link
+            href="/admin/dashboard"
+            className={cn(
+              'flex-1 py-1.5 text-[10px] font-semibold text-center transition-colors',
+              isOnAdminPage ? 'text-brand-600 bg-brand-50' : 'text-gray-400'
+            )}
+          >
+            Admin
+          </Link>
+        </div>
+      )}
+
       <div className="flex items-center justify-around px-2 py-1" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
-        {MOBILE_NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
           return (
             <Link
