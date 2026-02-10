@@ -3,29 +3,32 @@
 import { Sidebar } from '@/components/layout/sidebar';
 import { MobileNav } from '@/components/layout/mobile-nav';
 import { TopBar } from '@/components/layout/top-bar';
-
-// In production, this comes from Supabase auth context
-const DEMO_USER = {
-  name: 'Sarah Müller',
-  role: 'parent',
-  isAdmin: true, // For demo, show all features
-};
+import { AuthGuard } from '@/components/auth-guard';
+import { useAuth } from '@/providers/auth-provider';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const { profile } = useAuth();
+
+  const userName = profile?.full_name ?? '';
+  const userRole = profile?.role ?? 'parent';
+  const isAdmin = profile?.role === 'admin';
+
   return (
-    <div className="flex min-h-screen bg-shell">
-      <Sidebar
-        userName={DEMO_USER.name}
-        userRole={DEMO_USER.role}
-        isAdmin={DEMO_USER.isAdmin}
-      />
-      <main className="flex-1 min-w-0">
-        <TopBar userName={DEMO_USER.name} />
-        <div className="px-4 py-6 lg:px-8 lg:py-8 pb-safe max-w-7xl mx-auto">
-          {children}
-        </div>
-      </main>
-      <MobileNav />
-    </div>
+    <AuthGuard>
+      <div className="flex min-h-screen bg-shell">
+        <Sidebar
+          userName={userName}
+          userRole={userRole}
+          isAdmin={isAdmin}
+        />
+        <main className="flex-1 min-w-0">
+          <TopBar userName={userName} />
+          <div className="px-4 py-6 lg:px-8 lg:py-8 pb-safe max-w-7xl mx-auto">
+            {children}
+          </div>
+        </main>
+        <MobileNav />
+      </div>
+    </AuthGuard>
   );
 }

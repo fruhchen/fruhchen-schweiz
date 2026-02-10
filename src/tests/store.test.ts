@@ -1,32 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useAppStore } from '@/stores/app-store';
-import type { ChatMessage, UserProfile } from '@/types';
+import type { ChatMessage } from '@/types';
 
 describe('useAppStore', () => {
   beforeEach(() => {
     useAppStore.setState({
-      user: null,
       sidebarOpen: false,
       chatMessages: [],
       searchQuery: '',
-    });
-  });
-
-  describe('user', () => {
-    it('starts with null user', () => {
-      expect(useAppStore.getState().user).toBeNull();
-    });
-
-    it('sets user', () => {
-      const user = { id: '1', email: 'test@test.ch', role: 'parent' } as UserProfile;
-      useAppStore.getState().setUser(user);
-      expect(useAppStore.getState().user).toEqual(user);
-    });
-
-    it('clears user', () => {
-      useAppStore.getState().setUser({ id: '1' } as UserProfile);
-      useAppStore.getState().setUser(null);
-      expect(useAppStore.getState().user).toBeNull();
     });
   });
 

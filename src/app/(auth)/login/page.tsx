@@ -1,28 +1,60 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
+import { getSupabase } from '@/lib/supabase/client';
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+function LoginContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [magicLinkEmail, setMagicLinkEmail] = useState('');
   const [showPasswordLogin, setShowPasswordLogin] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect') || '/dashboard';
 
-  const handleMagicLink = (e: React.FormEvent) => {
+  const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!magicLinkEmail) return;
-    toast.success('Magic Link gesendet! Bitte prüfe dein E-Mail-Postfach.');
+    setLoading(true);
+    const { error } = await getSupabase().auth.signInWithOtp({
+      email: magicLinkEmail,
+      options: { emailRedirectTo: `${window.location.origin}${redirect}` },
+    });
+    setLoading(false);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success('Magic Link gesendet! Bitte prüfe dein E-Mail-Postfach.');
+    }
   };
 
-  const handlePasswordLogin = (e: React.FormEvent) => {
+  const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('Willkommen zurück!');
+    setLoading(true);
+    const { error } = await getSupabase().auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success('Willkommen zurück!');
+      router.push(redirect);
+    }
   };
 
   return (

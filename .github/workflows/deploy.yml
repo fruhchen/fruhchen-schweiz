@@ -23,10 +23,17 @@ jobs:
 
       - run: npm test -- --run
 
-      - run: npx next build
+      - name: Build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_APP_URL: https://fruhchen-schweiz.pages.dev
+          NEXT_PUBLIC_APP_NAME: Frühchen Schweiz
+        run: npx next build
 
       - name: Deploy to Cloudflare Pages
         env:
-          CLOUDFLARE_EMAIL: fruhchen@codazure.ai
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
-        run: npx wrangler pages deploy out --project-name=fruhchen-schweiz --branch=main --commit-dirty=true
+          CLOUDFLARE_EMAIL: fruhchen@codazure.ai
+        run: node scripts/deploy-cloudflare.mjs out

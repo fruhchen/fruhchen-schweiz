@@ -1,10 +1,7 @@
 import { create } from 'zustand';
-import type { UserProfile, ChatMessage } from '@/types';
+import type { ChatMessage } from '@/types';
 
 interface AppState {
-  user: UserProfile | null;
-  setUser: (user: UserProfile | null) => void;
-
   sidebarOpen: boolean;
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
@@ -18,9 +15,6 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set) => ({
-  user: null,
-  setUser: (user) => set({ user }),
-
   sidebarOpen: false,
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
   setSidebarOpen: (open) => set({ sidebarOpen: open }),

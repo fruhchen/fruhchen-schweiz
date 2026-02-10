@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
@@ -9,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { icons } from 'lucide-react';
 import { REGIONS, LANGUAGES } from '@/lib/constants';
+import { getSupabase } from '@/lib/supabase/client';
 
 /* ------------------------------------------------------------------ */
 /*  Types & Data                                                       */
@@ -77,6 +79,8 @@ const slideVariants = {
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   // Step 1
   const [name, setName] = useState('');
@@ -111,12 +115,33 @@ export default function RegisterPage() {
     setStep((s) => Math.max(s - 1, 1));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!privacyConsent) {
       toast.error('Bitte akzeptiere die Datenschutzerklärung.');
       return;
     }
-    toast.success('Willkommen bei Frühchen Schweiz!');
+    setLoading(true);
+    const { error } = await getSupabase().auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+          role: role || 'parent',
+          baby_name: babyName || undefined,
+          baby_birth_date: birthDate || undefined,
+          region: region || undefined,
+          language,
+        },
+      },
+    });
+    setLoading(false);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success('Willkommen bei Frühchen Schweiz!');
+      router.push('/dashboard');
+    }
   };
 
   /* ---- Progress indicator ---- */
