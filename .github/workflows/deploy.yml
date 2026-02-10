@@ -1,0 +1,32 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm test -- --run
+
+      - run: npx next build
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_EMAIL: fruhchen@codazure.ai
+          CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
+        run: npx wrangler pages deploy out --project-name=fruhchen-schweiz --branch=main --commit-dirty=true
