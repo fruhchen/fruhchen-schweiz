@@ -6,6 +6,7 @@
  *   CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_KEY, CLOUDFLARE_EMAIL
  */
 
+import { createHash } from 'crypto';
 import { readdir, readFile } from 'fs/promises';
 import { join, relative } from 'path';
 
@@ -19,6 +20,8 @@ if (!ACCOUNT_ID || !API_KEY || !EMAIL) {
   console.error('Missing env vars: CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_KEY, CLOUDFLARE_EMAIL');
   process.exit(1);
 }
+
+const headers = { 'X-Auth-Email': EMAIL, 'X-Auth-Key': API_KEY };
 
 async function collectFiles(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
@@ -34,29 +37,43 @@ async function collectFiles(dir) {
   return files;
 }
 
+function contentHash(buf) {
+  return createHash('sha256').update(buf).digest('hex');
+}
+
 async function deploy() {
   console.log(`Collecting files from ${OUT_DIR}...`);
-  const files = await collectFiles(OUT_DIR);
-  console.log(`Found ${files.length} files`);
+  const filePaths = await collectFiles(OUT_DIR);
+  console.log(`Found ${filePaths.length} files`);
 
+  // Build manifest and file map
+  const manifest = {};
+  const fileMap = new Map(); // hash -> { content, path }
+
+  for (const filePath of filePaths) {
+    const relPath = '/' + relative(OUT_DIR, filePath).replace(/\\/g, '/');
+    const content = await readFile(filePath);
+    const hash = contentHash(content);
+    manifest[relPath] = hash;
+    if (!fileMap.has(hash)) {
+      fileMap.set(hash, { content, path: relPath });
+    }
+  }
+
+  console.log(`Unique files: ${fileMap.size} (${filePaths.length} total, ${filePaths.length - fileMap.size} deduplicated)`);
+
+  // Build multipart form: manifest + files keyed by hash
   const form = new FormData();
-  for (const file of files) {
-    const relPath = '/' + relative(OUT_DIR, file).replace(/\\/g, '/');
-    const content = await readFile(file);
-    form.append(relPath, new Blob([content]), relPath);
+  form.append('manifest', JSON.stringify(manifest));
+
+  for (const [hash, { content, path }] of fileMap) {
+    form.append(hash, new Blob([content]), path);
   }
 
   console.log('Uploading to Cloudflare Pages...');
   const res = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/pages/projects/${PROJECT}/deployments`,
-    {
-      method: 'POST',
-      headers: {
-        'X-Auth-Email': EMAIL,
-        'X-Auth-Key': API_KEY,
-      },
-      body: form,
-    }
+    { method: 'POST', headers, body: form }
   );
 
   const data = await res.json();
