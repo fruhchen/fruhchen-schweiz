@@ -1,0 +1,7 @@
+name = "fruhchen-ai"
+main = "src/index.ts"
+compatibility_date = "2024-09-25"
+account_id = "d25d6578e14ef14e33461789079cae74"
+
+[ai]
+binding = "AI"

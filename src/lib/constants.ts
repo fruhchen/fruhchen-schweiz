@@ -81,6 +81,7 @@ export const NAV_ITEMS = {
     { href: '/hospital', label: 'Spital', icon: 'Building2' },
     { href: '/mental-health', label: 'Wohlbefinden', icon: 'Brain' },
     { href: '/neobox', label: 'NEO Box', icon: 'Package' },
+    { href: '/partners', label: 'Partner', icon: 'Handshake' },
   ],
   admin: [
     { href: '/admin/dashboard', label: 'Dashboard', icon: 'BarChart3' },

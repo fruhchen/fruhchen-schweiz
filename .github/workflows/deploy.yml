@@ -36,3 +36,10 @@ jobs:
           CLOUDFLARE_EMAIL: fruhchen@codazure.ai
           CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
         run: npx -y wrangler pages deploy out --project-name=fruhchen-schweiz --branch=main --commit-dirty=true
+
+      - name: Deploy AI Worker
+        working-directory: worker
+        env:
+          CLOUDFLARE_EMAIL: fruhchen@codazure.ai
+          CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
+        run: npx -y wrangler deploy

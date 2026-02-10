@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@/components/ui/icon';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -52,6 +51,7 @@ const PEERS = [
 const ACTIVE_CHATS = [
   {
     id: '1',
+    peerId: '1',
     peerName: 'Maria Keller',
     lastMessage: 'Das klingt wunderbar! Die Känguru-Pflege ist so wertvoll.',
     time: 'vor 2 Std.',
@@ -59,15 +59,187 @@ const ACTIVE_CHATS = [
   },
 ];
 
+const MOCK_CONVERSATION = [
+  {
+    id: 'c1',
+    sender: 'Du',
+    content: 'Hallo Maria, ich habe eine Frage zur Känguru-Pflege. Wie lange sollte ich mein Baby auf der Brust halten?',
+    time: '14:20',
+  },
+  {
+    id: 'c2',
+    sender: 'Maria Keller',
+    content: 'Hallo! Das ist eine tolle Frage. Am Anfang empfehle ich mindestens 60 Minuten am Stück. Je länger, desto besser für euer Baby. Meine Zwillinge haben es geliebt!',
+    time: '14:25',
+  },
+  {
+    id: 'c3',
+    sender: 'Du',
+    content: 'Wow, 60 Minuten! Und wie oft am Tag sollte man das machen?',
+    time: '14:28',
+  },
+  {
+    id: 'c4',
+    sender: 'Maria Keller',
+    content: 'So oft wie möglich! Ideal wäre mehrmals am Tag. Sprich am besten mit eurer Pflegekraft, die können euch helfen, das einzurichten. Bei uns auf der Neo war es möglich, das Baby fast den ganzen Tag auf der Brust zu haben.',
+    time: '14:32',
+  },
+  {
+    id: 'c5',
+    sender: 'Du',
+    content: 'Das beruhigt mich sehr. Danke für die Tipps!',
+    time: '14:35',
+  },
+  {
+    id: 'c6',
+    sender: 'Maria Keller',
+    content: 'Das klingt wunderbar! Die Känguru-Pflege ist so wertvoll. Ihr macht das grossartig. Meldet euch jederzeit, wenn ihr noch Fragen habt!',
+    time: '14:38',
+  },
+];
+
 const TOPICS = ['Alle', 'Frühgeburt', 'Stillen', 'Väter', 'Zwillinge', 'Nachsorge', 'Pränatal'];
+
+// ---------------------------------------------------------------------------
+// Conversation view
+// ---------------------------------------------------------------------------
+
+function ConversationView({
+  peerName,
+  onBack,
+}: {
+  peerName: string;
+  onBack: () => void;
+}) {
+  const [newMessage, setNewMessage] = useState('');
+  const [localMessages, setLocalMessages] = useState(MOCK_CONVERSATION);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [localMessages]);
+
+  const handleSend = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = newMessage.trim();
+    if (!trimmed) return;
+
+    setLocalMessages((prev) => [
+      ...prev,
+      {
+        id: `local-${Date.now()}`,
+        sender: 'Du',
+        content: trimmed,
+        time: new Date().toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' }),
+      },
+    ]);
+    setNewMessage('');
+  };
+
+  return (
+    <div className="-mx-4 -my-6 lg:-mx-8 lg:-my-8 flex flex-col h-[calc(100vh-4rem)] lg:h-[calc(100vh-2rem)]">
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur-lg border-b border-gray-100 px-4 py-3 flex items-center gap-3 flex-shrink-0">
+        <button
+          onClick={onBack}
+          className="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+        >
+          <Icon name="ArrowLeft" size={20} />
+        </button>
+        <Avatar name={peerName} size="md" />
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-gray-900">{peerName}</p>
+          <p className="text-xs text-emerald-600 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+            Online
+          </p>
+        </div>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+        {localMessages.map((msg) => {
+          const isMe = msg.sender === 'Du';
+          return (
+            <motion.div
+              key={msg.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`flex ${isMe ? 'justify-end' : 'items-end gap-2'}`}
+            >
+              {!isMe && <Avatar name={msg.sender} size="sm" />}
+              <div className={`max-w-[75%] flex flex-col ${isMe ? 'items-end' : 'items-start'} gap-1`}>
+                <div
+                  className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                    isMe
+                      ? 'bg-gradient-to-br from-brand-500 to-brand-600 text-white rounded-br-md shadow-md shadow-brand-500/15'
+                      : 'bg-white border border-gray-100 text-gray-800 rounded-bl-md shadow-soft'
+                  }`}
+                >
+                  {msg.content}
+                </div>
+                <span className="text-[10px] text-gray-400 px-1">{msg.time}</span>
+              </div>
+            </motion.div>
+          );
+        })}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input */}
+      <div className="flex-shrink-0 bg-white/90 backdrop-blur-xl border-t border-gray-100 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:pb-3">
+        <form onSubmit={handleSend} className="flex items-center gap-2">
+          <div className="flex-1">
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Nachricht schreiben..."
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-2xl text-sm text-gray-900
+                         placeholder:text-gray-400 transition-all duration-200
+                         focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400"
+            />
+          </div>
+          <motion.button
+            type="submit"
+            disabled={!newMessage.trim()}
+            whileTap={{ scale: 0.92 }}
+            className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-brand-600 text-white
+                       flex items-center justify-center shadow-md shadow-brand-500/20
+                       disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+          >
+            <Icon name="ArrowUp" size={20} strokeWidth={2} />
+          </motion.button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main page
+// ---------------------------------------------------------------------------
 
 export default function PeerPage() {
   const [selectedTopic, setSelectedTopic] = useState('Alle');
+  const [selectedChat, setSelectedChat] = useState<string | null>(null);
 
   const filteredPeers =
     selectedTopic === 'Alle'
       ? PEERS
       : PEERS.filter((p) => p.topics.some((t) => t.toLowerCase().includes(selectedTopic.toLowerCase())));
+
+  // Find active chat details
+  const activeChat = ACTIVE_CHATS.find((c) => c.id === selectedChat);
+
+  if (activeChat) {
+    return (
+      <ConversationView
+        peerName={activeChat.peerName}
+        onBack={() => setSelectedChat(null)}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -102,7 +274,7 @@ export default function PeerPage() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <h2 className="text-lg font-semibold text-gray-900 mb-3">Aktive Gespräche</h2>
           {ACTIVE_CHATS.map((chat) => (
-            <Card key={chat.id} interactive className="flex items-center gap-4">
+            <Card key={chat.id} interactive onClick={() => setSelectedChat(chat.id)} className="flex items-center gap-4">
               <Avatar name={chat.peerName} size="md" />
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-gray-900">{chat.peerName}</p>

@@ -2,30 +2,25 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 import { Icon } from '@/components/ui/icon';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-interface Source {
-  label: string;
-  url: string;
-}
-
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
-  sources?: Source[];
   timestamp: Date;
 }
 
 // ---------------------------------------------------------------------------
-// Mock data & helpers
+// Constants
 // ---------------------------------------------------------------------------
+
+const WORKER_URL = 'https://fruhchen-ai.fruhchen.workers.dev';
 
 const SUGGESTION_CHIPS = [
   'Was bedeutet CPAP?',
@@ -33,37 +28,6 @@ const SUGGESTION_CHIPS = [
   'Fragen für die nächste Visite',
   'Wie berechne ich das korrigierte Alter?',
 ] as const;
-
-const INITIAL_MESSAGES: Message[] = [
-  {
-    id: '1',
-    role: 'user',
-    content: 'Was ist Känguru-Pflege?',
-    timestamp: new Date(Date.now() - 60_000 * 5),
-  },
-  {
-    id: '2',
-    role: 'assistant',
-    content:
-      'Känguru-Pflege (auch Kangaroo Mother Care genannt) ist eine wunderbare Methode, bei der dein Frühchen direkten Haut-zu-Haut-Kontakt mit dir hat. Dein Baby wird dabei nur mit einer Windel bekleidet aufrecht auf deine nackte Brust gelegt und mit einem Tuch oder einer Decke zugedeckt.\n\nDie Vorteile sind beeindruckend:\n\n- Stabilisiert Herzschlag und Atmung deines Babys\n- Reguliert die Körpertemperatur natürlich\n- Fördert die Gewichtszunahme\n- Stärkt die Eltern-Kind-Bindung\n- Reduziert Stress — bei dir und deinem Baby\n- Unterstützt die Muttermilchproduktion\n\nDu kannst schon sehr früh damit beginnen — oft bereits auf der Neonatologie. Sprich dein Pflegeteam einfach an, sie helfen dir, die erste Känguru-Sitzung einzurichten. Selbst 30 Minuten können schon einen grossen Unterschied machen.',
-    sources: [
-      { label: 'fruehchenschweiz.ch/glossar', url: 'https://fruehchenschweiz.ch/glossar' },
-      { label: 'fruehchenschweiz.ch/stillen', url: 'https://fruehchenschweiz.ch/stillen' },
-    ],
-    timestamp: new Date(Date.now() - 60_000 * 4),
-  },
-];
-
-const MOCK_RESPONSES: Record<string, { content: string; sources: Source[] }> = {
-  default: {
-    content:
-      'Das ist eine tolle Frage! Basierend auf den Informationen von Frühchen Schweiz kann ich dir Folgendes sagen:\n\nEs ist völlig normal, sich als Elternteil eines Frühchens manchmal unsicher zu fühlen. Wichtig ist, dass du dir Unterstützung holst — sei es vom Pflegeteam, von anderen betroffenen Eltern oder von Fachpersonen.\n\nDenk daran: Jedes Frühchen entwickelt sich in seinem eigenen Tempo. Kleine Fortschritte sind grosse Meilensteine. Du machst das grossartig!',
-    sources: [
-      { label: 'fruehchenschweiz.ch/eltern', url: 'https://fruehchenschweiz.ch/eltern' },
-      { label: 'fruehchenschweiz.ch/faq', url: 'https://fruehchenschweiz.ch/faq' },
-    ],
-  },
-};
 
 function generateId() {
   return `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -147,44 +111,9 @@ function AssistantBubble({ message }: { message: Message }) {
       <AiAvatar size={32} />
       <div className="flex flex-col gap-2">
         <div className="bg-white border border-gray-100 rounded-2xl rounded-bl-md px-4 py-3.5 shadow-soft">
-          {/* Message text */}
           <div className="text-sm leading-relaxed text-gray-800 whitespace-pre-line">
             {message.content}
           </div>
-
-          {/* Sources */}
-          {message.sources && message.sources.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-gray-100">
-              <p className="text-[11px] font-medium text-gray-500 mb-1.5 flex items-center gap-1">
-                <Icon name="FileText" size={12} className="text-gray-400" />
-                Quellen
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {message.sources.map((source, i) => (
-                  <a
-                    key={i}
-                    href={source.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group"
-                  >
-                    <Badge
-                      variant="brand"
-                      className="text-[10px] hover:bg-brand-200 transition-colors cursor-pointer group-hover:shadow-sm"
-                    >
-                      <Icon name="ExternalLink" size={10} />
-                      {source.label}
-                    </Badge>
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Disclaimer */}
-          <p className="mt-2.5 text-[10px] text-gray-400 italic">
-            Dies ist keine medizinische Beratung.
-          </p>
         </div>
         <span className="text-[10px] text-gray-400 px-1">{formatTime(message.timestamp)}</span>
       </div>
@@ -201,7 +130,6 @@ function WelcomeState({ onSuggestionClick }: { onSuggestionClick: (text: string)
       transition={{ duration: 0.5 }}
       className="flex flex-col items-center justify-center flex-1 px-4 py-8 text-center"
     >
-      {/* Illustration area */}
       <motion.div
         animate={{ y: [0, -8, 0] }}
         transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
@@ -212,7 +140,6 @@ function WelcomeState({ onSuggestionClick }: { onSuggestionClick: (text: string)
             <Icon name="Sparkles" size={28} className="text-white" />
           </div>
         </div>
-        {/* Decorative dots */}
         <motion.div
           animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
@@ -231,7 +158,6 @@ function WelcomeState({ onSuggestionClick }: { onSuggestionClick: (text: string)
         Inhalten von Frühchen Schweiz.
       </p>
 
-      {/* Suggestion chips */}
       <div className="flex flex-wrap justify-center gap-2 max-w-md">
         {SUGGESTION_CHIPS.map((chip, i) => (
           <motion.button
@@ -257,24 +183,22 @@ function WelcomeState({ onSuggestionClick }: { onSuggestionClick: (text: string)
 // ---------------------------------------------------------------------------
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when messages change or typing starts
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  // Focus input on mount
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  const sendMessage = (text: string) => {
+  const sendMessage = async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || isTyping) return;
 
@@ -285,23 +209,42 @@ export default function ChatPage() {
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate AI response after 1.5s
-    setTimeout(() => {
-      const response = MOCK_RESPONSES.default;
+    try {
+      const conversationHistory = updatedMessages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
+      const res = await fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: conversationHistory }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Fehler: ${res.status}`);
+      }
+
+      const data = await res.json();
+
       const aiMessage: Message = {
         id: generateId(),
         role: 'assistant',
-        content: response.content,
-        sources: response.sources,
+        content: data.content,
         timestamp: new Date(),
       };
+
       setMessages((prev) => [...prev, aiMessage]);
+    } catch {
+      toast.error('Antwort konnte nicht geladen werden. Bitte versuche es erneut.');
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -375,7 +318,6 @@ export default function ChatPage() {
                 )
               )}
 
-              {/* Typing indicator */}
               <AnimatePresence>{isTyping && <TypingIndicator />}</AnimatePresence>
             </motion.div>
           )}
@@ -383,13 +325,12 @@ export default function ChatPage() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input area -- fixed above mobile nav */}
+      {/* Input area */}
       <div className="flex-shrink-0 bg-white/90 backdrop-blur-xl border-t border-gray-100 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:pb-3">
         <form
           onSubmit={handleSubmit}
           className="max-w-2xl mx-auto flex items-center gap-2"
         >
-          {/* Microphone button (decorative) */}
           <button
             type="button"
             className="w-10 h-10 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors flex-shrink-0"
@@ -398,7 +339,6 @@ export default function ChatPage() {
             <Icon name="Mic" size={20} />
           </button>
 
-          {/* Text input */}
           <div className="flex-1 relative">
             <input
               ref={inputRef}
@@ -414,7 +354,6 @@ export default function ChatPage() {
             />
           </div>
 
-          {/* Send button */}
           <motion.button
             type="submit"
             disabled={!inputValue.trim() || isTyping}
