@@ -1,10 +1,12 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Icon } from '@/components/ui/icon';
 import { icons } from 'lucide-react';
+import { useAppStore, useStoreHydrated } from '@/stores/app-store';
 
 const PARENT_NAV = [
   { href: '/dashboard', label: 'Home', icon: 'LayoutDashboard' },
@@ -26,13 +28,45 @@ interface MobileNavProps {
   isAdmin?: boolean;
 }
 
+function formatElapsed(ms: number): string {
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
 export function MobileNav({ isAdmin }: MobileNavProps) {
   const pathname = usePathname();
   const isOnAdminPage = pathname.startsWith('/admin');
   const navItems = isAdmin && isOnAdminPage ? ADMIN_NAV : PARENT_NAV;
 
+  const hydrated = useStoreHydrated();
+  const { timerRunning, timerStartTime, timerProject, timerTask } = useAppStore();
+  const [elapsed, setElapsed] = useState('00:00:00');
+  const showTimer = hydrated && timerRunning;
+
+  useEffect(() => {
+    if (!timerRunning || !timerStartTime) { setElapsed('00:00:00'); return; }
+    const tick = () => setElapsed(formatElapsed(Date.now() - timerStartTime));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [timerRunning, timerStartTime]);
+
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-xl border-t border-gray-100">
+      {/* Running timer banner */}
+      {showTimer && (
+        <Link href="/admin/time-tracking" className="flex items-center justify-between px-4 py-1.5 bg-brand-50 border-b border-brand-100">
+          <span className="flex items-center gap-2 text-xs font-medium text-brand-600">
+            <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
+            {timerProject} · {timerTask}
+          </span>
+          <span className="text-xs font-mono font-bold text-brand-600 tabular-nums">{elapsed}</span>
+        </Link>
+      )}
+
       {/* Admin toggle bar */}
       {isAdmin && (
         <div className="flex border-b border-gray-100">

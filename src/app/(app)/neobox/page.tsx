@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/modal';
 import { PageHeader } from '@/components/layout/page-header';
 import { toast } from 'sonner';
 
@@ -19,8 +20,20 @@ const BOX_CONTENTS = [
   { name: 'Gutschein', description: 'Gutschein für Stillberatung oder Tragberatung', icon: 'Gift' },
 ];
 
+const DIGITAL_RESOURCES = [
+  { name: 'Checkliste für die Neonatologie', description: 'Eine umfassende Checkliste mit allem, was ihr für den Aufenthalt auf der Neonatologie braucht.', icon: 'FileText' },
+  { name: 'Ratgeber Stillen & Ernährung', description: 'Tipps und Informationen rund um das Stillen und die Ernährung von Frühgeborenen.', icon: 'FileText' },
+  { name: 'Rechte als Eltern', description: 'Eure Rechte als Eltern eines Frühgeborenen — Versicherung, Arbeitgeber und mehr.', icon: 'FileText' },
+  { name: 'Regionale Beratungsangebote', description: 'Übersicht über Beratungsstellen und Unterstützungsangebote in eurer Region.', icon: 'FileText' },
+];
+
+type BoxItem = (typeof BOX_CONTENTS)[number];
+type DigitalItem = (typeof DIGITAL_RESOURCES)[number];
+
 export default function NeoboxPage() {
   const [ordered, setOrdered] = useState(false);
+  const [selectedBoxItem, setSelectedBoxItem] = useState<BoxItem | null>(null);
+  const [selectedDigitalItem, setSelectedDigitalItem] = useState<DigitalItem | null>(null);
 
   const handleOrder = () => {
     setOrdered(true);
@@ -53,7 +66,7 @@ export default function NeoboxPage() {
           {ordered && (
             <div className="flex items-center gap-2 justify-center text-emerald-600">
               <Icon name="CheckCircle" size={20} />
-              <span className="font-semibold">Bestellt! Lieferung in 5–7 Werktagen.</span>
+              <span className="font-semibold">Bestellt! Lieferung in 5-7 Werktagen.</span>
             </div>
           )}
         </Card>
@@ -70,7 +83,12 @@ export default function NeoboxPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 * i }}
             >
-              <Card className="flex items-start gap-3" padding="sm">
+              <Card
+                className="flex items-start gap-3 cursor-pointer"
+                padding="sm"
+                interactive
+                onClick={() => setSelectedBoxItem(item)}
+              >
                 <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center flex-shrink-0">
                   <Icon name={item.icon as any} size={18} className="text-brand-500" />
                 </div>
@@ -96,13 +114,15 @@ export default function NeoboxPage() {
           </div>
         </div>
         <div className="space-y-2">
-          {['Checkliste für die Neonatologie', 'Ratgeber Stillen & Ernährung', 'Rechte als Eltern', 'Regionale Beratungsangebote'].map((item) => (
+          {DIGITAL_RESOURCES.map((item) => (
             <button
-              key={item}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-left"
+              type="button"
+              key={item.name}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-left cursor-pointer"
+              onClick={() => setSelectedDigitalItem(item)}
             >
               <Icon name="FileText" size={16} className="text-gray-400" />
-              <span className="text-sm text-gray-700">{item}</span>
+              <span className="text-sm text-gray-700">{item.name}</span>
               <Icon name="ChevronRight" size={16} className="text-gray-300 ml-auto" />
             </button>
           ))}
@@ -116,6 +136,76 @@ export default function NeoboxPage() {
           <span>In Partnerschaft mit LetsFamily und unterstützt durch Spendengelder.</span>
         </div>
       </Card>
+
+      {/* Box item detail modal */}
+      <Modal
+        open={!!selectedBoxItem}
+        onClose={() => setSelectedBoxItem(null)}
+        title="Box-Inhalt"
+        size="md"
+      >
+        {selectedBoxItem && (
+          <div className="space-y-5">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-brand-50 flex items-center justify-center flex-shrink-0">
+                <Icon name={selectedBoxItem.icon as any} size={32} className="text-brand-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">{selectedBoxItem.name}</h3>
+                <Badge variant="brand" className="mt-1">In der Box enthalten</Badge>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Beschreibung</p>
+              <p className="text-sm text-gray-700 leading-relaxed">{selectedBoxItem.description}</p>
+            </div>
+
+            <div className="bg-gray-50 rounded-2xl p-4">
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <Icon name="Info" size={16} className="text-brand-400" />
+                <span>Dieser Artikel ist Teil der Baby-NEO Box und wird kostenlos an betroffene Familien versendet.</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Digital resource detail modal */}
+      <Modal
+        open={!!selectedDigitalItem}
+        onClose={() => setSelectedDigitalItem(null)}
+        title="Digitale Ressource"
+        size="md"
+      >
+        {selectedDigitalItem && (
+          <div className="space-y-5">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-violet-50 flex items-center justify-center flex-shrink-0">
+                <Icon name={selectedDigitalItem.icon as any} size={32} className="text-violet-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">{selectedDigitalItem.name}</h3>
+                <Badge variant="violet" className="mt-1">Digital verfügbar</Badge>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Beschreibung</p>
+              <p className="text-sm text-gray-700 leading-relaxed">{selectedDigitalItem.description}</p>
+            </div>
+
+            <div className="flex gap-3 pt-2 border-t border-gray-100">
+              <Button variant="primary" size="sm" icon="Download">
+                Herunterladen
+              </Button>
+              <Button variant="secondary" size="sm" icon="ExternalLink">
+                Online ansehen
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

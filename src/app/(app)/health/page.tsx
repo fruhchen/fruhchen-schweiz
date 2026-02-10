@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SearchInput } from '@/components/ui/search-input';
 import { PageHeader } from '@/components/layout/page-header';
+import { Modal } from '@/components/ui/modal';
 
 const CATEGORIES = [
   { id: 'all', label: 'Alle', icon: 'LayoutGrid', count: 18 },
@@ -110,6 +111,7 @@ const EXPERIENCE_REPORTS = [
 export default function HealthPage() {
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
+  const [selectedArticle, setSelectedArticle] = useState<(typeof ARTICLES)[number] | null>(null);
 
   const filtered = ARTICLES.filter((a) => {
     const matchCat = activeCategory === 'all' || a.category === activeCategory;
@@ -118,6 +120,9 @@ export default function HealthPage() {
   });
 
   const featuredArticles = ARTICLES.filter((a) => a.featured);
+
+  const getCategoryLabel = (categoryId: string) =>
+    CATEGORIES.find((c) => c.id === categoryId)?.label ?? categoryId;
 
   return (
     <div className="space-y-6">
@@ -162,7 +167,11 @@ export default function HealthPage() {
                 transition={{ delay: 0.05 * i }}
                 className="min-w-[280px] max-w-[300px]"
               >
-                <Card interactive className="h-full space-y-2">
+                <Card
+                  interactive
+                  className="h-full space-y-2 cursor-pointer"
+                  onClick={() => setSelectedArticle(article)}
+                >
                   <div className="h-24 -mx-6 -mt-6 rounded-t-3xl bg-gradient-to-br from-brand-100 to-violet-100 flex items-center justify-center">
                     <Icon name="FileText" size={24} className="text-brand-400" />
                   </div>
@@ -192,7 +201,11 @@ export default function HealthPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.03 * i }}
           >
-            <Card interactive className="flex items-start gap-3">
+            <Card
+              interactive
+              className="flex items-start gap-3 cursor-pointer"
+              onClick={() => setSelectedArticle(article)}
+            >
               <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <Icon name="FileText" size={18} className="text-brand-400" />
               </div>
@@ -231,6 +244,35 @@ export default function HealthPage() {
           ))}
         </div>
       </div>
+
+      {/* Article detail modal */}
+      <Modal
+        open={!!selectedArticle}
+        onClose={() => setSelectedArticle(null)}
+        title={selectedArticle?.title ?? ''}
+        size="md"
+      >
+        {selectedArticle && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Badge variant="brand">{getCategoryLabel(selectedArticle.category)}</Badge>
+              <span className="text-sm text-gray-400 flex items-center gap-1">
+                <Icon name="Clock" size={14} />
+                {selectedArticle.readTime}
+              </span>
+            </div>
+            <div className="h-32 rounded-2xl bg-gradient-to-br from-brand-100 to-violet-100 flex items-center justify-center">
+              <Icon name="FileText" size={36} className="text-brand-400" />
+            </div>
+            <p className="text-sm text-gray-700 leading-relaxed">{selectedArticle.excerpt}</p>
+            <div className="pt-2 border-t border-gray-100">
+              <p className="text-xs text-gray-400">
+                Dieser Artikel wird in Kürze vollständig verfügbar sein. Lesezeit: {selectedArticle.readTime}
+              </p>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

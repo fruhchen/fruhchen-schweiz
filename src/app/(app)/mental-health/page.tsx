@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/layout/page-header';
+import { Modal } from '@/components/ui/modal';
 
 const SELF_CHECK_QUESTIONS = [
   'Wie fühlst du dich heute insgesamt?',
@@ -82,6 +83,8 @@ export default function MentalHealthPage() {
   const [checkStarted, setCheckStarted] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
+  const [selectedArticle, setSelectedArticle] = useState<(typeof ARTICLES)[number] | null>(null);
+  const [selectedResource, setSelectedResource] = useState<(typeof RESOURCES)[number] | null>(null);
 
   const handleAnswer = (value: number) => {
     const newAnswers = [...answers, value];
@@ -192,7 +195,11 @@ export default function MentalHealthPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 * i }}
             >
-              <Card interactive className="flex items-start gap-3">
+              <Card
+                interactive
+                className="flex items-start gap-3 cursor-pointer"
+                onClick={() => setSelectedResource(resource)}
+              >
                 <div className={`w-10 h-10 rounded-xl bg-${resource.color}-100 flex items-center justify-center flex-shrink-0`}>
                   <Icon name={resource.icon as any} size={20} className={`text-${resource.color}-500`} />
                 </div>
@@ -205,6 +212,7 @@ export default function MentalHealthPage() {
                   {resource.phone && (
                     <a
                       href={`tel:${resource.phone.replace(/\s/g, '')}`}
+                      onClick={(e) => e.stopPropagation()}
                       className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 mt-1"
                     >
                       <Icon name="Phone" size={14} />
@@ -229,7 +237,11 @@ export default function MentalHealthPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + 0.05 * i }}
             >
-              <Card interactive>
+              <Card
+                interactive
+                className="cursor-pointer"
+                onClick={() => setSelectedArticle(article)}
+              >
                 <div className="flex items-center gap-2 mb-2">
                   <Badge variant="violet">{article.category}</Badge>
                   <span className="text-xs text-gray-400">{article.readTime}</span>
@@ -241,6 +253,67 @@ export default function MentalHealthPage() {
           ))}
         </div>
       </div>
+
+      {/* Article detail modal */}
+      <Modal
+        open={!!selectedArticle}
+        onClose={() => setSelectedArticle(null)}
+        title={selectedArticle?.title ?? ''}
+        size="md"
+      >
+        {selectedArticle && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Badge variant="violet">{selectedArticle.category}</Badge>
+              <span className="text-sm text-gray-400 flex items-center gap-1">
+                <Icon name="Clock" size={14} />
+                {selectedArticle.readTime}
+              </span>
+            </div>
+            <p className="text-sm text-gray-700 leading-relaxed">{selectedArticle.description}</p>
+            <div className="pt-2 border-t border-gray-100">
+              <p className="text-xs text-gray-400">
+                Dieser Artikel wird in Kürze vollständig verfügbar sein. Lesezeit: {selectedArticle.readTime}
+              </p>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Resource detail modal */}
+      <Modal
+        open={!!selectedResource}
+        onClose={() => setSelectedResource(null)}
+        title={selectedResource?.title ?? ''}
+        size="md"
+      >
+        {selectedResource && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className={`w-12 h-12 rounded-xl bg-${selectedResource.color}-100 flex items-center justify-center`}>
+                <Icon name={selectedResource.icon as any} size={24} className={`text-${selectedResource.color}-500`} />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">{selectedResource.title}</h3>
+                {selectedResource.urgent && <Badge variant="rose">24/7 erreichbar</Badge>}
+              </div>
+            </div>
+            <p className="text-sm text-gray-700 leading-relaxed">{selectedResource.description}</p>
+            {selectedResource.phone && (
+              <div className="pt-3 border-t border-gray-100">
+                <p className="text-xs text-gray-500 mb-2">Telefonnummer</p>
+                <a
+                  href={`tel:${selectedResource.phone.replace(/\s/g, '')}`}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-brand-50 text-brand-700 rounded-xl font-semibold text-sm hover:bg-brand-100 transition-colors"
+                >
+                  <Icon name="Phone" size={16} />
+                  {selectedResource.phone}
+                </a>
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

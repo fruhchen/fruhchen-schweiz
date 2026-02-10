@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Icon } from '@/components/ui/icon';
 import { Card } from '@/components/ui/card';
@@ -9,7 +9,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar } from '@/components/ui/avatar';
 import { PageHeader } from '@/components/layout/page-header';
+import { Modal } from '@/components/ui/modal';
 import { toast } from 'sonner';
+import { useAppStore } from '@/stores/app-store';
 
 const TEAM_MEMBERS = [
   { name: 'Dina Hediger', role: 'Geschäftsleitung', hoursThisMonth: 84, color: 'brand' },
@@ -19,7 +21,15 @@ const TEAM_MEMBERS = [
   { name: 'Mario Bühler', role: 'IT & Web', hoursThisMonth: 20, color: 'blue' },
 ];
 
-const RECENT_ENTRIES = [
+interface TimeEntry {
+  user: string;
+  project: string;
+  task: string;
+  hours: number;
+  date: string;
+}
+
+const RECENT_ENTRIES: TimeEntry[] = [
   { user: 'Dina Hediger', project: 'Grants', task: 'Antrag Glückskette', hours: 3.5, date: '2026-02-09' },
   { user: 'Désirée Koch', project: 'Newsletter', task: 'Jahresbericht Draft', hours: 2, date: '2026-02-09' },
   { user: 'Sandra Meier', project: 'Peer Support', task: 'Supervision Bern', hours: 1.5, date: '2026-02-09' },
@@ -28,22 +38,52 @@ const RECENT_ENTRIES = [
   { user: 'Mario Bühler', project: 'IT', task: 'Website-Update', hours: 3, date: '2026-02-08' },
 ];
 
-const PROJECTS = ['Alle', 'Grants', 'Newsletter', 'Peer Support', 'Events', 'Admin', 'IT'];
+const PROJECT_OPTIONS = ['Grants', 'Newsletter', 'Peer Support', 'Events', 'Admin', 'IT'];
+const FILTER_OPTIONS = ['Alle', ...PROJECT_OPTIONS];
+
+function formatElapsed(ms: number): string {
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
 
 export default function TimeTrackingPage() {
-  const [tracking, setTracking] = useState(false);
+  const { timerRunning, timerStartTime, timerProject, timerTask, startTimer, stopTimer } = useAppStore();
   const [elapsed, setElapsed] = useState('00:00:00');
   const [projectFilter, setProjectFilter] = useState('Alle');
+  const [selectedEntry, setSelectedEntry] = useState<TimeEntry | null>(null);
 
-  const startTracking = () => {
-    setTracking(true);
+  // Pre-start inputs
+  const [newProject, setNewProject] = useState(PROJECT_OPTIONS[0]);
+  const [newTask, setNewTask] = useState('');
+
+  // Real timer tick
+  useEffect(() => {
+    if (!timerRunning || !timerStartTime) {
+      setElapsed('00:00:00');
+      return;
+    }
+    const tick = () => setElapsed(formatElapsed(Date.now() - timerStartTime));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [timerRunning, timerStartTime]);
+
+  const handleStart = () => {
+    if (!newTask.trim()) {
+      toast.error('Bitte gib eine Aufgabe ein.');
+      return;
+    }
+    startTimer(newProject, newTask.trim());
     toast.success('Timer gestartet!');
   };
 
-  const stopTracking = () => {
-    setTracking(false);
-    toast.success('Zeit erfasst: 1h 23m');
-    setElapsed('00:00:00');
+  const handleStop = () => {
+    stopTimer();
+    toast.success(`Zeit erfasst: ${elapsed}`);
+    setNewTask('');
   };
 
   const filtered = projectFilter === 'Alle'
@@ -62,18 +102,48 @@ export default function TimeTrackingPage() {
 
       {/* Timer */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <Card className={`text-center space-y-4 ${tracking ? 'ring-2 ring-brand-200 bg-brand-50/30' : ''}`}>
+        <Card className={`text-center space-y-4 ${timerRunning ? 'ring-2 ring-brand-200 bg-brand-50/30' : ''}`}>
           <div className="text-4xl font-mono font-bold text-gray-900 tabular-nums">
-            {tracking ? '01:23:45' : elapsed}
+            {elapsed}
           </div>
+
+          {/* Task/project inputs — show before starting */}
+          {!timerRunning && (
+            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-gray-500 mb-1 text-left">Projekt</label>
+                <select
+                  value={newProject}
+                  onChange={(e) => setNewProject(e.target.value)}
+                  title="Projekt auswählen"
+                  className="w-full px-3 py-2.5 bg-white rounded-xl border border-gray-200 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400"
+                >
+                  {PROJECT_OPTIONS.map((p) => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-gray-500 mb-1 text-left">Aufgabe</label>
+                <input
+                  type="text"
+                  value={newTask}
+                  onChange={(e) => setNewTask(e.target.value)}
+                  placeholder="z.B. Antrag schreiben"
+                  className="w-full px-3 py-2.5 bg-white rounded-xl border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400"
+                />
+              </div>
+            </div>
+          )}
+
           <div className="flex justify-center gap-3">
-            {!tracking ? (
-              <Button variant="primary" size="lg" icon="Play" onClick={startTracking}>
+            {!timerRunning ? (
+              <Button variant="primary" size="lg" icon="Play" onClick={handleStart}>
                 Timer starten
               </Button>
             ) : (
               <>
-                <Button variant="danger" size="lg" icon="Square" onClick={stopTracking}>
+                <Button variant="danger" size="lg" icon="Square" onClick={handleStop}>
                   Stoppen
                 </Button>
                 <Button variant="secondary" size="lg" icon="Pause">
@@ -82,10 +152,10 @@ export default function TimeTrackingPage() {
               </>
             )}
           </div>
-          {tracking && (
+          {timerRunning && (
             <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
-              <span>Projekt: Grants</span>
-              <span>Aufgabe: Antrag schreiben</span>
+              <span className="flex items-center gap-1"><Icon name="Folder" size={14} /> {timerProject}</span>
+              <span className="flex items-center gap-1"><Icon name="FileText" size={14} /> {timerTask}</span>
             </div>
           )}
         </Card>
@@ -117,7 +187,7 @@ export default function TimeTrackingPage() {
 
       {/* Filter */}
       <div className="flex gap-2 overflow-x-auto pb-1">
-        {PROJECTS.map((p) => (
+        {FILTER_OPTIONS.map((p) => (
           <button
             key={p}
             onClick={() => setProjectFilter(p)}
@@ -140,7 +210,7 @@ export default function TimeTrackingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.03 * i }}
           >
-            <Card padding="sm" className="flex items-center gap-3">
+            <Card padding="sm" className="flex items-center gap-3 cursor-pointer hover:shadow-soft-lg transition-all" onClick={() => setSelectedEntry(entry)}>
               <Avatar name={entry.user} size="sm" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">{entry.task}</p>
@@ -154,6 +224,39 @@ export default function TimeTrackingPage() {
           </motion.div>
         ))}
       </div>
+
+      {/* Time entry detail modal */}
+      <Modal open={!!selectedEntry} onClose={() => setSelectedEntry(null)} title="Zeiteintrag" size="md">
+        {selectedEntry && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Avatar name={selectedEntry.user} size="md" />
+              <div>
+                <h3 className="font-semibold text-gray-900">{selectedEntry.user}</h3>
+                <p className="text-sm text-gray-500">{new Date(selectedEntry.date).toLocaleDateString('de-CH', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Projekt</p>
+                <p className="text-sm text-gray-900">{selectedEntry.project}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Aufgabe</p>
+                <p className="text-sm text-gray-900">{selectedEntry.task}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Dauer</p>
+                <p className="text-lg font-bold text-gray-900">{selectedEntry.hours}h</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Datum</p>
+                <p className="text-sm text-gray-900">{new Date(selectedEntry.date).toLocaleDateString('de-CH')}</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

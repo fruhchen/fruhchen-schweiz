@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Icon } from '@/components/ui/icon';
 import { Card } from '@/components/ui/card';
@@ -7,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/avatar';
 import { PageHeader } from '@/components/layout/page-header';
+import { Modal } from '@/components/ui/modal';
 
 const CARE_TEAM = [
   { name: 'Dr. med. K. Hofmann', role: 'Neonatologin', icon: 'Stethoscope', available: true },
@@ -27,6 +29,9 @@ const HOSPITAL_INFO = [
 ];
 
 export default function HospitalPage() {
+  const [selectedMember, setSelectedMember] = useState<(typeof CARE_TEAM)[number] | null>(null);
+  const [selectedInfo, setSelectedInfo] = useState<(typeof HOSPITAL_INFO)[number] | null>(null);
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -61,7 +66,12 @@ export default function HospitalPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 * i }}
             >
-              <Card interactive className="flex items-center gap-3" padding="sm">
+              <Card
+                interactive
+                className="flex items-center gap-3 cursor-pointer"
+                padding="sm"
+                onClick={() => setSelectedMember(member)}
+              >
                 <Avatar name={member.name} size="md" />
                 <div className="flex-1 min-w-0">
                   <h3 className="font-medium text-gray-900 text-sm truncate">{member.name}</h3>
@@ -90,7 +100,11 @@ export default function HospitalPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + 0.05 * i }}
             >
-              <Card padding="sm">
+              <Card
+                padding="sm"
+                className="cursor-pointer"
+                onClick={() => setSelectedInfo(info)}
+              >
                 <div className="flex gap-3">
                   <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
                     <Icon name={info.icon as any} size={16} className="text-blue-500" />
@@ -132,6 +146,83 @@ export default function HospitalPage() {
           </div>
         </div>
       </Card>
+
+      {/* Care team member detail modal */}
+      <Modal
+        open={!!selectedMember}
+        onClose={() => setSelectedMember(null)}
+        title="Teammitglied"
+        size="md"
+      >
+        {selectedMember && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <Avatar name={selectedMember.name} size="lg" />
+              <div>
+                <h3 className="font-semibold text-gray-900 text-lg">{selectedMember.name}</h3>
+                <p className="text-sm text-gray-500 flex items-center gap-1.5">
+                  <Icon name={selectedMember.icon as any} size={14} />
+                  {selectedMember.role}
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3 bg-gray-50 rounded-2xl p-4">
+              <div className="flex items-center gap-3">
+                <Icon name="User" size={16} className="text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-400">Name</p>
+                  <p className="text-sm font-medium text-gray-900">{selectedMember.name}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Icon name={selectedMember.icon as any} size={16} className="text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-400">Rolle</p>
+                  <p className="text-sm font-medium text-gray-900">{selectedMember.role}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Icon name="Signal" size={16} className="text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-400">Verfügbarkeit</p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <div className={`w-2.5 h-2.5 rounded-full ${selectedMember.available ? 'bg-emerald-500' : 'bg-gray-300'}`} />
+                    <p className="text-sm font-medium text-gray-900">
+                      {selectedMember.available ? 'Verfügbar' : 'Derzeit nicht verfügbar'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Hospital info detail modal */}
+      <Modal
+        open={!!selectedInfo}
+        onClose={() => setSelectedInfo(null)}
+        title={selectedInfo?.label ?? 'Information'}
+        size="md"
+      >
+        {selectedInfo && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+                <Icon name={selectedInfo.icon as any} size={22} className="text-blue-500" />
+              </div>
+              <h3 className="font-semibold text-gray-900 text-lg">{selectedInfo.label}</h3>
+            </div>
+
+            <div className="bg-gray-50 rounded-2xl p-4">
+              <p className="text-sm text-gray-900 whitespace-pre-line leading-relaxed">
+                {selectedInfo.value}
+              </p>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

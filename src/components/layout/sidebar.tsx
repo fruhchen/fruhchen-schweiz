@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,6 +9,7 @@ import { Icon } from '@/components/ui/icon';
 import { Avatar } from '@/components/ui/avatar';
 import { NAV_ITEMS } from '@/lib/constants';
 import { icons } from 'lucide-react';
+import { useAppStore, useStoreHydrated } from '@/stores/app-store';
 
 interface SidebarProps {
   userName: string;
@@ -16,12 +17,36 @@ interface SidebarProps {
   isAdmin?: boolean;
 }
 
+function formatElapsed(ms: number): string {
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
 export function Sidebar({ userName, userRole, isAdmin }: SidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [showAdminNav, setShowAdminNav] = useState(pathname.startsWith('/admin'));
+  const hydrated = useStoreHydrated();
+  const { timerRunning, timerStartTime, timerProject, timerTask } = useAppStore();
+  const [elapsed, setElapsed] = useState('00:00:00');
+  const showTimer = hydrated && timerRunning;
 
   const navItems = showAdminNav ? NAV_ITEMS.admin : NAV_ITEMS.parent;
+
+  // Timer tick for sidebar
+  useEffect(() => {
+    if (!timerRunning || !timerStartTime) {
+      setElapsed('00:00:00');
+      return;
+    }
+    const tick = () => setElapsed(formatElapsed(Date.now() - timerStartTime));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [timerRunning, timerStartTime]);
 
   return (
     <aside
@@ -100,6 +125,37 @@ export function Sidebar({ userName, userRole, isAdmin }: SidebarProps) {
           );
         })}
       </nav>
+
+      {/* Running Timer Widget */}
+      <AnimatePresence>
+        {showTimer && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="border-t border-gray-100"
+          >
+            <Link href="/admin/time-tracking" className="block px-3 py-3 hover:bg-brand-50/50 transition-colors">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-brand-50 flex items-center justify-center flex-shrink-0">
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    <Icon name="Timer" size={16} className="text-brand-500" />
+                  </motion.div>
+                </div>
+                {!collapsed && (
+                  <div className="min-w-0">
+                    <p className="text-sm font-mono font-bold text-brand-600 tabular-nums">{elapsed}</p>
+                    <p className="text-[10px] text-gray-500 truncate">{timerProject} · {timerTask}</p>
+                  </div>
+                )}
+              </div>
+            </Link>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* User */}
       <div className="border-t border-gray-100 p-3">

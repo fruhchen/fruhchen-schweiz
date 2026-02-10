@@ -109,13 +109,17 @@ function AssistantBubble({ message }: { message: Message }) {
       className="flex items-end gap-2.5 max-w-[85%]"
     >
       <AiAvatar size={32} />
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
         <div className="bg-white border border-gray-100 rounded-2xl rounded-bl-md px-4 py-3.5 shadow-soft">
           <div className="text-sm leading-relaxed text-gray-800 whitespace-pre-line">
             {message.content}
           </div>
         </div>
-        <span className="text-[10px] text-gray-400 px-1">{formatTime(message.timestamp)}</span>
+        <div className="flex items-center gap-2 px-1">
+          <span className="text-[10px] text-gray-400">{formatTime(message.timestamp)}</span>
+          <span className="text-[10px] text-gray-300">·</span>
+          <span className="text-[10px] text-gray-300">AI-gestützt · Keine medizinische Beratung</span>
+        </div>
       </div>
     </motion.div>
   );
@@ -260,24 +264,6 @@ export default function ChatPage() {
 
   return (
     <div className="-mx-4 -my-6 lg:-mx-8 lg:-my-8 flex flex-col h-[calc(100vh-4rem)] lg:h-[calc(100vh-2rem)]">
-      {/* Floating disclaimer bar */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-warm-50 border-b border-warm-200/50 px-4 py-2 text-center flex-shrink-0"
-      >
-        <p className="text-[11px] text-gray-500 flex items-center justify-center gap-2 flex-wrap">
-          <span className="inline-flex items-center gap-1">
-            <Icon name="Sparkles" size={11} className="text-brand-400" />
-            AI-gestützt
-          </span>
-          <span className="text-gray-300">|</span>
-          <span>Basierend auf Inhalten von fruehchenschweiz.ch</span>
-          <span className="text-gray-300">|</span>
-          <span className="text-gray-400">Keine medizinische Beratung</span>
-        </p>
-      </motion.div>
-
       {/* Chat header */}
       <div className="bg-white/80 backdrop-blur-lg border-b border-gray-100 px-4 py-3 flex items-center gap-3 flex-shrink-0">
         <AiAvatar />

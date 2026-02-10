@@ -6,6 +6,7 @@ import { Icon } from '@/components/ui/icon';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Modal } from '@/components/ui/modal';
 import { PageHeader } from '@/components/layout/page-header';
 
 type Stage = 'idea' | 'draft' | 'review' | 'scheduled' | 'sent';
@@ -29,8 +30,33 @@ const ITEMS = [
   { id: '8', title: 'Spendenaufruf Weihnachten', stage: 'sent' as Stage, author: 'Désirée', sentDate: '2025-12-15', opens: 489, clicks: 156 },
 ];
 
+type NewsletterItem = (typeof ITEMS)[number];
+
 export default function NewsletterPage() {
   const [view, setView] = useState<'kanban' | 'list'>('kanban');
+  const [selectedItem, setSelectedItem] = useState<NewsletterItem | null>(null);
+
+  const getStageIndex = (stage: Stage) => STAGES.findIndex((s) => s.id === stage);
+
+  const canMoveForward = (item: NewsletterItem) => {
+    const idx = getStageIndex(item.stage);
+    return idx < STAGES.length - 1;
+  };
+
+  const canMoveBack = (item: NewsletterItem) => {
+    const idx = getStageIndex(item.stage);
+    return idx > 0;
+  };
+
+  const getNextStage = (stage: Stage): Stage | null => {
+    const idx = getStageIndex(stage);
+    return idx < STAGES.length - 1 ? STAGES[idx + 1].id : null;
+  };
+
+  const getPrevStage = (stage: Stage): Stage | null => {
+    const idx = getStageIndex(stage);
+    return idx > 0 ? STAGES[idx - 1].id : null;
+  };
 
   return (
     <div className="space-y-6">
@@ -93,7 +119,12 @@ export default function NewsletterPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.05 * i }}
                     >
-                      <Card interactive padding="sm" className="space-y-2">
+                      <Card
+                        interactive
+                        padding="sm"
+                        className="space-y-2 cursor-pointer"
+                        onClick={() => setSelectedItem(item)}
+                      >
                         <h3 className="font-medium text-gray-900 text-sm">{item.title}</h3>
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-gray-400">{item.author}</span>
@@ -134,7 +165,11 @@ export default function NewsletterPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.03 * i }}
             >
-              <Card interactive className="flex items-center gap-4">
+              <Card
+                interactive
+                className="flex items-center gap-4 cursor-pointer"
+                onClick={() => setSelectedItem(item)}
+              >
                 <Badge variant={STAGES.find((s) => s.id === item.stage)?.color as any}>
                   {STAGES.find((s) => s.id === item.stage)?.label}
                 </Badge>
@@ -153,6 +188,119 @@ export default function NewsletterPage() {
           ))}
         </div>
       )}
+
+      {/* Newsletter detail modal */}
+      <Modal
+        open={!!selectedItem}
+        onClose={() => setSelectedItem(null)}
+        title="Newsletter Details"
+        size="md"
+      >
+        {selectedItem && (
+          <div className="space-y-5">
+            {/* Title */}
+            <div>
+              <h3 className="text-xl font-bold text-gray-900">{selectedItem.title}</h3>
+            </div>
+
+            {/* Detail fields */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Status</p>
+                <Badge variant={STAGES.find((s) => s.id === selectedItem.stage)?.color as any}>
+                  {STAGES.find((s) => s.id === selectedItem.stage)?.label}
+                </Badge>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Autorin</p>
+                <p className="text-sm font-medium text-gray-900">{selectedItem.author}</p>
+              </div>
+              {selectedItem.date && (
+                <div>
+                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Erstellt am</p>
+                  <p className="text-sm text-gray-700">
+                    {new Date(selectedItem.date).toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  </p>
+                </div>
+              )}
+              {'scheduledFor' in selectedItem && selectedItem.scheduledFor && (
+                <div>
+                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Geplant für</p>
+                  <div className="flex items-center gap-1.5">
+                    <Icon name="Calendar" size={14} className="text-brand-500" />
+                    <p className="text-sm text-gray-700">
+                      {new Date(selectedItem.scheduledFor).toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </p>
+                  </div>
+                </div>
+              )}
+              {'sentDate' in selectedItem && selectedItem.sentDate && (
+                <div>
+                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Versandt am</p>
+                  <div className="flex items-center gap-1.5">
+                    <Icon name="Send" size={14} className="text-green-500" />
+                    <p className="text-sm text-gray-700">
+                      {new Date(selectedItem.sentDate).toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Performance stats for sent newsletters */}
+            {'opens' in selectedItem && (
+              <div className="bg-gray-50 rounded-2xl p-4">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Performance</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-brand-600">{selectedItem.opens}</p>
+                    <p className="text-xs text-gray-500">Opens</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-teal-600">{selectedItem.clicks}</p>
+                    <p className="text-xs text-gray-500">Clicks</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Stage action buttons */}
+            <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+              {canMoveBack(selectedItem) && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  icon="ArrowLeft"
+                  onClick={() => {
+                    const prev = getPrevStage(selectedItem.stage);
+                    if (prev) {
+                      setSelectedItem({ ...selectedItem, stage: prev });
+                    }
+                  }}
+                >
+                  {STAGES.find((s) => s.id === getPrevStage(selectedItem.stage))?.label}
+                </Button>
+              )}
+              <div className="flex-1" />
+              {canMoveForward(selectedItem) && (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  icon="ArrowRight"
+                  onClick={() => {
+                    const next = getNextStage(selectedItem.stage);
+                    if (next) {
+                      setSelectedItem({ ...selectedItem, stage: next });
+                    }
+                  }}
+                >
+                  {STAGES.find((s) => s.id === getNextStage(selectedItem.stage))?.label}
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

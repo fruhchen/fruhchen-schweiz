@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Icon } from '@/components/ui/icon';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { PageHeader } from '@/components/layout/page-header';
+import { Modal } from '@/components/ui/modal';
 
 const TIMELINE_PHASES = [
   {
@@ -100,7 +102,11 @@ const statusLabel = {
   upcoming: { text: 'Kommend', color: 'gray' },
 };
 
+type TimelinePhase = (typeof TIMELINE_PHASES)[number];
+
 export default function TimelinePage() {
+  const [selectedPhase, setSelectedPhase] = useState<TimelinePhase | null>(null);
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -155,7 +161,7 @@ export default function TimelinePage() {
                 )}
               </div>
 
-              <Card className={`${phase.status === 'current' ? 'ring-2 ring-brand-200' : ''} lg:w-[45%] ${i % 2 === 0 ? 'lg:ml-auto lg:mr-[5%]' : 'lg:mr-auto lg:ml-[5%]'}`}>
+              <Card interactive className={`cursor-pointer ${phase.status === 'current' ? 'ring-2 ring-brand-200' : ''} lg:w-[45%] ${i % 2 === 0 ? 'lg:ml-auto lg:mr-[5%]' : 'lg:mr-auto lg:ml-[5%]'}`} onClick={() => setSelectedPhase(phase)}>
                 <div className="flex items-start gap-3 mb-3">
                   <div className={`w-10 h-10 rounded-xl ${phase.bgColor} flex items-center justify-center flex-shrink-0`}>
                     <Icon name={phase.icon as any} size={20} className={phase.iconColor} />
@@ -207,6 +213,83 @@ export default function TimelinePage() {
           ))}
         </div>
       </div>
+
+      {/* Phase detail modal */}
+      <Modal
+        open={!!selectedPhase}
+        onClose={() => setSelectedPhase(null)}
+        title={selectedPhase?.label ?? 'Phase'}
+        size="md"
+      >
+        {selectedPhase && (
+          <div className="space-y-5">
+            <div className="flex items-center gap-4">
+              <div className={`w-14 h-14 rounded-2xl ${selectedPhase.bgColor} flex items-center justify-center flex-shrink-0`}>
+                <Icon name={selectedPhase.icon as any} size={28} className={selectedPhase.iconColor} />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">{selectedPhase.label}</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <Badge variant={statusLabel[selectedPhase.status].color as any}>
+                    {statusLabel[selectedPhase.status].text}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3 bg-gray-50 rounded-2xl p-4">
+              <div className="flex items-center gap-3">
+                <Icon name="Calendar" size={16} className="text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-400">Zeitraum</p>
+                  <p className="text-sm font-medium text-gray-900">{selectedPhase.date}</p>
+                </div>
+              </div>
+              {selectedPhase.duration && (
+                <div className="flex items-center gap-3">
+                  <Icon name="Clock" size={16} className="text-gray-400" />
+                  <div>
+                    <p className="text-xs text-gray-400">Dauer</p>
+                    <p className="text-sm font-medium text-brand-600">{selectedPhase.duration}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-gray-500 mb-3">Schritte & Meilensteine</p>
+              <ul className="space-y-2.5">
+                {selectedPhase.items.map((item, j) => {
+                  const isCheckable = typeof item === 'object';
+                  const text = isCheckable ? item.text : item;
+                  const done = isCheckable ? item.done : selectedPhase.status === 'completed';
+
+                  return (
+                    <li key={j} className="flex items-center gap-3 text-sm">
+                      <div
+                        className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                          done
+                            ? 'bg-emerald-100 text-emerald-600'
+                            : 'bg-gray-100 text-gray-400'
+                        }`}
+                      >
+                        {done ? (
+                          <Icon name="Check" size={14} />
+                        ) : (
+                          <div className="w-2 h-2 rounded-full bg-gray-300" />
+                        )}
+                      </div>
+                      <span className={done ? 'text-gray-700 font-medium' : 'text-gray-400'}>
+                        {text}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

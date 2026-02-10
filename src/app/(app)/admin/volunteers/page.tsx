@@ -10,8 +10,21 @@ import { Avatar } from '@/components/ui/avatar';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { SearchInput } from '@/components/ui/search-input';
 import { PageHeader } from '@/components/layout/page-header';
+import { Modal } from '@/components/ui/modal';
 
-const VOLUNTEERS = [
+interface Volunteer {
+  id: string;
+  name: string;
+  region: string;
+  role: string;
+  active: boolean;
+  modulesCompleted: number;
+  totalModules: number;
+  refresherDue: string | null;
+  sessionsThisMonth: number;
+}
+
+const VOLUNTEERS: Volunteer[] = [
   {
     id: '1', name: 'Maria Keller', region: 'Bern', role: 'Senior Peer', active: true,
     modulesCompleted: 8, totalModules: 8, refresherDue: null, sessionsThisMonth: 12,
@@ -58,6 +71,7 @@ const roleColors: Record<string, string> = {
 export default function VolunteersPage() {
   const [search, setSearch] = useState('');
   const [regionFilter, setRegionFilter] = useState('Alle');
+  const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(null);
 
   const regions = ['Alle', ...Array.from(new Set(VOLUNTEERS.map((v) => v.region)))];
   const filtered = VOLUNTEERS.filter((v) => {
@@ -128,7 +142,7 @@ export default function VolunteersPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.03 * i }}
           >
-            <Card interactive className="space-y-3">
+            <Card interactive className="space-y-3 cursor-pointer" onClick={() => setSelectedVolunteer(vol)}>
               <div className="flex items-center gap-3">
                 <Avatar name={vol.name} size="md" />
                 <div className="flex-1 min-w-0">
@@ -179,6 +193,70 @@ export default function VolunteersPage() {
           ))}
         </div>
       </Card>
+
+      {/* Volunteer detail modal */}
+      <Modal open={!!selectedVolunteer} onClose={() => setSelectedVolunteer(null)} title={selectedVolunteer?.name || ''} size="lg">
+        {selectedVolunteer && (
+          <div className="space-y-6">
+            <div className="flex items-center gap-4">
+              <Avatar name={selectedVolunteer.name} size="lg" />
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Badge variant={roleColors[selectedVolunteer.role] as any}>{selectedVolunteer.role}</Badge>
+                  {selectedVolunteer.active ? <Badge variant="green">Aktiv</Badge> : <Badge variant="gray">Inaktiv</Badge>}
+                </div>
+                <div className="flex items-center gap-1 text-sm text-gray-500">
+                  <Icon name="MapPin" size={14} />
+                  {selectedVolunteer.region}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Sessions diesen Monat</p>
+                <p className="text-2xl font-bold text-gray-900">{selectedVolunteer.sessionsThisMonth}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Auffrischung fällig</p>
+                <p className="text-sm text-gray-900">
+                  {selectedVolunteer.refresherDue
+                    ? new Date(selectedVolunteer.refresherDue).toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' })
+                    : 'Keine'}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">Ausbildungsfortschritt</p>
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span className="text-gray-500">Training</span>
+                <span className="font-medium text-gray-700">{selectedVolunteer.modulesCompleted}/{selectedVolunteer.totalModules} Module</span>
+              </div>
+              <ProgressBar
+                value={selectedVolunteer.modulesCompleted}
+                max={selectedVolunteer.totalModules}
+                color={selectedVolunteer.modulesCompleted === selectedVolunteer.totalModules ? 'green' : 'brand'}
+              />
+              <div className="mt-3 space-y-1.5">
+                {TRAINING_MODULES.map((module, i) => {
+                  const completed = i < selectedVolunteer.modulesCompleted;
+                  return (
+                    <div key={module} className="flex items-center gap-2 text-sm">
+                      <Icon
+                        name={completed ? 'CheckCircle2' : 'Circle'}
+                        size={16}
+                        className={completed ? 'text-emerald-500' : 'text-gray-300'}
+                      />
+                      <span className={completed ? 'text-gray-700' : 'text-gray-400'}>{module}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

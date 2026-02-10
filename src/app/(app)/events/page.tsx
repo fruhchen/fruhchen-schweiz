@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SearchInput } from '@/components/ui/search-input';
 import { PageHeader } from '@/components/layout/page-header';
+import { Modal } from '@/components/ui/modal';
 
 /* -------------------------------------------------------------------------- */
 /*  Types                                                                     */
@@ -263,6 +264,16 @@ function getFirstDayOfMonth(year: number, month: number): number {
   return day === 0 ? 6 : day - 1; // Monday = 0
 }
 
+function formatEventDate(dateStr: string): string {
+  const d = parseDate(dateStr);
+  return d.toLocaleDateString('de-CH', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
 /* -------------------------------------------------------------------------- */
 /*  Sub-components                                                            */
 /* -------------------------------------------------------------------------- */
@@ -321,7 +332,13 @@ function ParticipantsBar({
   );
 }
 
-function FeaturedEventCard({ event }: { event: FruhchenEvent }) {
+function FeaturedEventCard({
+  event,
+  onSelect,
+}: {
+  event: FruhchenEvent;
+  onSelect: (event: FruhchenEvent) => void;
+}) {
   const dateObj = parseDate(event.date);
 
   return (
@@ -329,7 +346,8 @@ function FeaturedEventCard({ event }: { event: FruhchenEvent }) {
       variants={fadeUp}
       initial="hidden"
       animate="visible"
-      className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-rose-500 via-brand-500 to-violet-500 p-[1px]"
+      className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-rose-500 via-brand-500 to-violet-500 p-[1px] cursor-pointer"
+      onClick={() => onSelect(event)}
     >
       <div className="relative rounded-3xl bg-gradient-to-br from-rose-500/90 via-brand-500/90 to-violet-500/90 p-6 sm:p-8 overflow-hidden">
         {/* Decorative background elements */}
@@ -393,6 +411,7 @@ function FeaturedEventCard({ event }: { event: FruhchenEvent }) {
               size="lg"
               icon="ArrowRight"
               className="bg-white text-brand-600 border-0 shadow-lg hover:bg-white/90 hover:text-brand-700"
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
             >
               Anmelden
             </Button>
@@ -403,7 +422,15 @@ function FeaturedEventCard({ event }: { event: FruhchenEvent }) {
   );
 }
 
-function EventCard({ event, index }: { event: FruhchenEvent; index: number }) {
+function EventCard({
+  event,
+  index,
+  onSelect,
+}: {
+  event: FruhchenEvent;
+  index: number;
+  onSelect: (event: FruhchenEvent) => void;
+}) {
   return (
     <motion.div
       variants={cardVariants}
@@ -411,7 +438,7 @@ function EventCard({ event, index }: { event: FruhchenEvent; index: number }) {
       layoutId={event.id}
       custom={index}
     >
-      <Card interactive className="group">
+      <Card interactive className="group cursor-pointer" onClick={() => onSelect(event)}>
         <div className="flex gap-4">
           {/* Date badge */}
           <DateBadge dateStr={event.date} type={event.type} />
@@ -465,6 +492,7 @@ function EventCard({ event, index }: { event: FruhchenEvent; index: number }) {
                 size="sm"
                 icon="ArrowRight"
                 disabled={event.participants >= event.maxParticipants}
+                onClick={(e: React.MouseEvent) => e.stopPropagation()}
               >
                 Anmelden
               </Button>
@@ -480,10 +508,12 @@ function CalendarGrid({
   events,
   currentMonth,
   currentYear,
+  onSelectEvent,
 }: {
   events: FruhchenEvent[];
   currentMonth: number;
   currentYear: number;
+  onSelectEvent: (event: FruhchenEvent) => void;
 }) {
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
@@ -565,10 +595,11 @@ function CalendarGrid({
                         <div
                           key={evt.id}
                           className={`
-                            text-[10px] leading-tight font-medium px-1.5 py-0.5 rounded-md truncate
+                            text-[10px] leading-tight font-medium px-1.5 py-0.5 rounded-md truncate cursor-pointer hover:opacity-80 transition-opacity
                             ${TYPE_COLORS[evt.type].bg} ${TYPE_COLORS[evt.type].text}
                           `}
                           title={evt.title}
+                          onClick={() => onSelectEvent(evt)}
                         >
                           {evt.title}
                         </div>
@@ -601,6 +632,7 @@ export default function EventsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [calendarMonth, setCalendarMonth] = useState(2); // March 2026 (0-indexed)
   const [calendarYear, setCalendarYear] = useState(2026);
+  const [selectedEvent, setSelectedEvent] = useState<FruhchenEvent | null>(null);
 
   /* -- Filtering logic -- */
   const filteredEvents = EVENTS.filter((event) => {
@@ -773,7 +805,7 @@ export default function EventsPage() {
       {/* ------------------------------------------------------------------ */}
       {featuredEvent && viewMode === 'list' && selectedRegion === 'Alle' && selectedTypes.size === 0 && !searchQuery && (
         <div className="mb-6">
-          <FeaturedEventCard event={featuredEvent} />
+          <FeaturedEventCard event={featuredEvent} onSelect={setSelectedEvent} />
         </div>
       )}
 
@@ -800,7 +832,7 @@ export default function EventsPage() {
             <AnimatePresence mode="popLayout">
               {upcomingEvents.length > 0 ? (
                 upcomingEvents.map((event, i) => (
-                  <EventCard key={event.id} event={event} index={i} />
+                  <EventCard key={event.id} event={event} index={i} onSelect={setSelectedEvent} />
                 ))
               ) : (
                 <motion.div
@@ -853,6 +885,7 @@ export default function EventsPage() {
             events={filteredEvents}
             currentMonth={calendarMonth}
             currentYear={calendarYear}
+            onSelectEvent={setSelectedEvent}
           />
 
           {/* Events for selected month */}
@@ -880,7 +913,7 @@ export default function EventsPage() {
                       parseDate(a.date).getTime() - parseDate(b.date).getTime()
                   )
                   .map((event, i) => (
-                    <EventCard key={event.id} event={event} index={i} />
+                    <EventCard key={event.id} event={event} index={i} onSelect={setSelectedEvent} />
                   ))}
               </AnimatePresence>
 
@@ -932,6 +965,121 @@ export default function EventsPage() {
           </Button>
         </Card>
       </motion.div>
+
+      {/* ------------------------------------------------------------------ */}
+      {/*  Event Detail Modal                                                */}
+      {/* ------------------------------------------------------------------ */}
+      <Modal
+        open={!!selectedEvent}
+        onClose={() => setSelectedEvent(null)}
+        title="Event-Details"
+        size="md"
+      >
+        {selectedEvent && (
+          <div className="space-y-5">
+            {/* Title and type */}
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                {selectedEvent.title}
+              </h3>
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant={TYPE_BADGE_VARIANT[selectedEvent.type]}>
+                  {selectedEvent.type}
+                </Badge>
+                {selectedEvent.isOnline ? (
+                  <Badge variant="blue">
+                    <Icon name="Globe" size={11} />
+                    Online
+                  </Badge>
+                ) : (
+                  <Badge variant="gray">{selectedEvent.region}</Badge>
+                )}
+                {selectedEvent.isFeatured && (
+                  <Badge variant="yellow">
+                    <Icon name="Star" size={11} />
+                    Highlight
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            {/* Detail fields */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 text-sm">
+                <div className="w-8 h-8 rounded-xl bg-brand-50 flex items-center justify-center flex-shrink-0">
+                  <Icon name="CalendarDays" size={16} className="text-brand-500" />
+                </div>
+                <div>
+                  <p className="text-gray-500 text-xs font-medium">Datum</p>
+                  <p className="text-gray-900 font-medium">{formatEventDate(selectedEvent.date)}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 text-sm">
+                <div className="w-8 h-8 rounded-xl bg-violet-50 flex items-center justify-center flex-shrink-0">
+                  <Icon name="Clock" size={16} className="text-violet-500" />
+                </div>
+                <div>
+                  <p className="text-gray-500 text-xs font-medium">Uhrzeit</p>
+                  <p className="text-gray-900 font-medium">{selectedEvent.time}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 text-sm">
+                <div className="w-8 h-8 rounded-xl bg-teal-50 flex items-center justify-center flex-shrink-0">
+                  <Icon name="MapPin" size={16} className="text-teal-500" />
+                </div>
+                <div>
+                  <p className="text-gray-500 text-xs font-medium">Ort</p>
+                  <p className="text-gray-900 font-medium">{selectedEvent.location}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 text-sm">
+                <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
+                  <Icon name="Users" size={16} className="text-amber-500" />
+                </div>
+                <div>
+                  <p className="text-gray-500 text-xs font-medium">Teilnehmer</p>
+                  <p className="text-gray-900 font-medium">
+                    {selectedEvent.participants} / {selectedEvent.maxParticipants} Plätze belegt
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Participants bar */}
+            <div className="px-1">
+              <ParticipantsBar
+                current={selectedEvent.participants}
+                max={selectedEvent.maxParticipants}
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <p className="text-xs font-medium text-gray-500 mb-1.5">Beschreibung</p>
+              <p className="text-sm text-gray-700 leading-relaxed">
+                {selectedEvent.description}
+              </p>
+            </div>
+
+            {/* CTA */}
+            <div className="pt-2">
+              <Button
+                size="lg"
+                icon="ArrowRight"
+                fullWidth
+                disabled={selectedEvent.participants >= selectedEvent.maxParticipants}
+              >
+                {selectedEvent.participants >= selectedEvent.maxParticipants
+                  ? 'Ausgebucht'
+                  : 'Jetzt anmelden'}
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

@@ -79,6 +79,18 @@ export default function ProfilePage() {
               <Input label="Baby-Name" defaultValue="Lina" />
               <Input label="Geburtsdatum" defaultValue="2025-12-28" type="date" />
               <Input label="Gestationswochen (SSW)" defaultValue="29" type="number" />
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium text-gray-700">Sprache</label>
+                <select
+                  defaultValue={profile?.language || 'de'}
+                  title="Sprache auswählen"
+                  className="w-full px-4 py-3 bg-white rounded-2xl border border-gray-200 text-gray-900 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 hover:border-gray-300"
+                >
+                  <option value="de">Deutsch</option>
+                  <option value="fr">Français</option>
+                  <option value="it">Italiano</option>
+                </select>
+              </div>
             </div>
             <div className="flex gap-3">
               <Button variant="primary" onClick={() => { setEditing(false); toast.success('Profil gespeichert!'); }}>

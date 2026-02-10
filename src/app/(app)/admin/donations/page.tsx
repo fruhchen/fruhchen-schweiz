@@ -7,8 +7,19 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/layout/page-header';
+import { Modal } from '@/components/ui/modal';
 
-const DONATIONS = [
+interface Donation {
+  id: string;
+  donor: string;
+  amount: number;
+  method: string;
+  date: string;
+  recurring: boolean;
+  receipt: boolean;
+}
+
+const DONATIONS: Donation[] = [
   { id: '1', donor: 'Familie Brunner', amount: 200, method: 'twint', date: '2026-02-08', recurring: true, receipt: true },
   { id: '2', donor: 'Anonym', amount: 50, method: 'online', date: '2026-02-07', recurring: false, receipt: false },
   { id: '3', donor: 'Stiftung Mercator', amount: 5000, method: 'bank', date: '2026-02-05', recurring: false, receipt: true },
@@ -44,6 +55,7 @@ const methodLabels: Record<string, string> = {
 
 export default function DonationsPage() {
   const [filter, setFilter] = useState<string>('all');
+  const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
 
   const totalYTD = DONATIONS.reduce((sum, d) => sum + d.amount, 0);
   const recurringCount = DONATIONS.filter((d) => d.recurring).length;
@@ -127,7 +139,7 @@ export default function DonationsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.03 * i }}
           >
-            <Card interactive className="flex items-center gap-4">
+            <Card interactive className="flex items-center gap-4 cursor-pointer" onClick={() => setSelectedDonation(donation)}>
               <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
                 <Icon name={methodIcons[donation.method] as any} size={18} className="text-gray-500" />
               </div>
@@ -152,6 +164,54 @@ export default function DonationsPage() {
           </motion.div>
         ))}
       </div>
+
+      {/* Donation detail modal */}
+      <Modal open={!!selectedDonation} onClose={() => setSelectedDonation(null)} title="Spendendetails" size="md">
+        {selectedDonation && (
+          <div className="space-y-5">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center">
+                <Icon name={methodIcons[selectedDonation.method] as any} size={22} className="text-gray-500" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 text-lg">{selectedDonation.donor}</h3>
+                <div className="flex items-center gap-2 mt-0.5">
+                  {selectedDonation.recurring && <Badge variant="violet">Gönner*in</Badge>}
+                  {selectedDonation.receipt ? <Badge variant="green">Bescheinigung erstellt</Badge> : <Badge variant="yellow">Bescheinigung ausstehend</Badge>}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Betrag</p>
+                <p className="text-2xl font-bold text-gray-900">CHF {selectedDonation.amount.toLocaleString('de-CH')}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Datum</p>
+                <p className="text-sm text-gray-900">
+                  {new Date(selectedDonation.date).toLocaleDateString('de-CH', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Zahlungsmethode</p>
+                <p className="text-sm text-gray-900">{methodLabels[selectedDonation.method]}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Typ</p>
+                <p className="text-sm text-gray-900">{selectedDonation.recurring ? 'Wiederkehrend' : 'Einmalig'}</p>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-2 border-t border-gray-100">
+              {!selectedDonation.receipt && (
+                <Button variant="primary" size="sm" icon="FileText">Bescheinigung erstellen</Button>
+              )}
+              <Button variant="secondary" size="sm" icon="Mail">Dankesmail senden</Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { PageHeader } from '@/components/layout/page-header';
+import { Modal } from '@/components/ui/modal';
 
 const UPCOMING_APPOINTMENTS = [
   {
@@ -56,8 +57,16 @@ const CHECKINS = [
 
 const MOOD_EMOJI = ['', '😢', '😔', '😐', '😊', '😄'];
 
+const typeLabels: Record<string, string> = {
+  checkup: 'Kontrolle',
+  specialist: 'Facharzt',
+  therapy: 'Therapie',
+};
+
 export default function FollowUpPage() {
   const [activeTab, setActiveTab] = useState<'appointments' | 'medications' | 'checkins'>('appointments');
+  const [selectedAppointment, setSelectedAppointment] = useState<(typeof UPCOMING_APPOINTMENTS)[number] | null>(null);
+  const [selectedMedication, setSelectedMedication] = useState<(typeof MEDICATIONS)[number] | null>(null);
 
   return (
     <div className="space-y-6">
@@ -111,7 +120,11 @@ export default function FollowUpPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 * i }}
             >
-              <Card interactive className="flex gap-4">
+              <Card
+                interactive
+                className="flex gap-4 cursor-pointer"
+                onClick={() => setSelectedAppointment(apt)}
+              >
                 <div className="w-14 h-14 rounded-2xl bg-brand-50 flex flex-col items-center justify-center flex-shrink-0">
                   <span className="text-lg font-bold text-brand-600">
                     {new Date(apt.date).getDate()}
@@ -155,7 +168,10 @@ export default function FollowUpPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 * i }}
             >
-              <Card className={!med.active ? 'opacity-60' : ''}>
+              <Card
+                className={`cursor-pointer ${!med.active ? 'opacity-60' : ''}`}
+                onClick={() => setSelectedMedication(med)}
+              >
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                     med.active ? 'bg-emerald-100' : 'bg-gray-100'
@@ -171,7 +187,7 @@ export default function FollowUpPage() {
                     {med.note && <p className="text-xs text-gray-400 mt-0.5">{med.note}</p>}
                   </div>
                   {med.active && (
-                    <Button variant="ghost" size="sm" icon="Check">
+                    <Button variant="ghost" size="sm" icon="Check" onClick={(e: React.MouseEvent) => { e.stopPropagation(); }}>
                       Genommen
                     </Button>
                   )}
@@ -220,6 +236,134 @@ export default function FollowUpPage() {
           ))}
         </div>
       )}
+
+      {/* Appointment detail modal */}
+      <Modal
+        open={!!selectedAppointment}
+        onClose={() => setSelectedAppointment(null)}
+        title="Termin-Details"
+        size="md"
+      >
+        {selectedAppointment && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-brand-50 flex flex-col items-center justify-center flex-shrink-0">
+                <span className="text-base font-bold text-brand-600">
+                  {new Date(selectedAppointment.date).getDate()}
+                </span>
+                <span className="text-[9px] text-brand-500 font-medium uppercase">
+                  {new Date(selectedAppointment.date).toLocaleDateString('de-CH', { month: 'short' })}
+                </span>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">{selectedAppointment.title}</h3>
+                <Badge variant="brand">{typeLabels[selectedAppointment.type] ?? selectedAppointment.type}</Badge>
+              </div>
+            </div>
+
+            <div className="space-y-3 bg-gray-50 rounded-2xl p-4">
+              <div className="flex items-center gap-3">
+                <Icon name="Stethoscope" size={16} className="text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-400">Arzt / Therapeut</p>
+                  <p className="text-sm font-medium text-gray-900">{selectedAppointment.doctor}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Icon name="Calendar" size={16} className="text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-400">Datum</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {new Date(selectedAppointment.date).toLocaleDateString('de-CH', {
+                      weekday: 'long',
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Icon name="Clock" size={16} className="text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-400">Uhrzeit</p>
+                  <p className="text-sm font-medium text-gray-900">{selectedAppointment.time} Uhr</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Icon name="MapPin" size={16} className="text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-400">Ort</p>
+                  <p className="text-sm font-medium text-gray-900">{selectedAppointment.location}</p>
+                </div>
+              </div>
+            </div>
+
+            {selectedAppointment.notes && (
+              <div className="bg-amber-50 border border-amber-200/50 rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Icon name="StickyNote" size={14} className="text-amber-500" />
+                  <span className="text-xs font-medium text-amber-700">Notizen</span>
+                </div>
+                <p className="text-sm text-amber-900">{selectedAppointment.notes}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
+
+      {/* Medication detail modal */}
+      <Modal
+        open={!!selectedMedication}
+        onClose={() => setSelectedMedication(null)}
+        title="Medikamenten-Details"
+        size="md"
+      >
+        {selectedMedication && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                selectedMedication.active ? 'bg-emerald-100' : 'bg-gray-100'
+              }`}>
+                <Icon name="Pill" size={24} className={selectedMedication.active ? 'text-emerald-600' : 'text-gray-400'} />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">{selectedMedication.name}</h3>
+                <Badge variant={selectedMedication.active ? 'teal' : 'gray'}>
+                  {selectedMedication.active ? 'Aktiv' : 'Abgesetzt'}
+                </Badge>
+              </div>
+            </div>
+
+            <div className="space-y-3 bg-gray-50 rounded-2xl p-4">
+              <div className="flex items-center gap-3">
+                <Icon name="Droplets" size={16} className="text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-400">Dosierung</p>
+                  <p className="text-sm font-medium text-gray-900">{selectedMedication.dosage}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Icon name="Clock" size={16} className="text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-400">Einnahmezeit</p>
+                  <p className="text-sm font-medium text-gray-900">{selectedMedication.time}</p>
+                </div>
+              </div>
+            </div>
+
+            {selectedMedication.note && (
+              <div className="bg-amber-50 border border-amber-200/50 rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Icon name="StickyNote" size={14} className="text-amber-500" />
+                  <span className="text-xs font-medium text-amber-700">Hinweis</span>
+                </div>
+                <p className="text-sm text-amber-900">{selectedMedication.note}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

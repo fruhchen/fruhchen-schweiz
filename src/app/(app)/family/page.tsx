@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { PageHeader } from '@/components/layout/page-header';
+import { Modal } from '@/components/ui/modal';
 import { toast } from 'sonner';
 
 const PAST_UPDATES = [
@@ -45,6 +46,7 @@ export default function FamilyPage() {
   const [selectedMembers, setSelectedMembers] = useState<string[]>(
     FAMILY_MEMBERS.filter((m) => m.active).map((m) => m.name)
   );
+  const [selectedUpdate, setSelectedUpdate] = useState<(typeof PAST_UPDATES)[number] | null>(null);
 
   const toggleMember = (name: string) => {
     setSelectedMembers((prev) =>
@@ -162,7 +164,10 @@ export default function FamilyPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + 0.05 * i }}
             >
-              <Card>
+              <Card
+                className="cursor-pointer"
+                onClick={() => setSelectedUpdate(update)}
+              >
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-gray-400">
                     {new Date(update.date).toLocaleDateString('de-CH', { weekday: 'long', day: 'numeric', month: 'long' })}
@@ -179,6 +184,45 @@ export default function FamilyPage() {
           ))}
         </div>
       </div>
+
+      {/* Update detail modal */}
+      <Modal
+        open={!!selectedUpdate}
+        onClose={() => setSelectedUpdate(null)}
+        title="Update Details"
+        size="md"
+      >
+        {selectedUpdate && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Icon name="Calendar" size={16} className="text-gray-400" />
+              <span className="text-sm font-medium text-gray-700">
+                {new Date(selectedUpdate.date).toLocaleDateString('de-CH', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+              </span>
+              <Badge variant="green">Gesendet</Badge>
+            </div>
+            <div className="bg-gray-50 rounded-2xl p-4">
+              <p className="text-sm text-gray-700 leading-relaxed">{selectedUpdate.content}</p>
+            </div>
+            <div className="pt-3 border-t border-gray-100">
+              <p className="text-xs text-gray-500 mb-2 font-medium">Geteilt mit</p>
+              <div className="flex flex-wrap gap-2">
+                {selectedUpdate.sharedWith.map((name) => (
+                  <div
+                    key={name}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-brand-50 rounded-full"
+                  >
+                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-brand-400 to-violet-400 flex items-center justify-center text-white text-[10px] font-semibold">
+                      {name.split(' ').map((n) => n[0]).join('')}
+                    </div>
+                    <span className="text-xs text-brand-700 font-medium">{name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

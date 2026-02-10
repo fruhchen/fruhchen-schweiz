@@ -9,14 +9,27 @@ import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/avatar';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { PageHeader } from '@/components/layout/page-header';
+import { Modal } from '@/components/ui/modal';
 
 type ProjectStatus = 'active' | 'planning' | 'completed' | 'paused';
 
-const PROJECTS = [
+interface Project {
+  id: string;
+  name: string;
+  status: ProjectStatus;
+  progress: number;
+  lead: string;
+  team: string[];
+  deadline: string;
+  tasks: { total: number; done: number };
+  description: string;
+}
+
+const PROJECTS: Project[] = [
   {
     id: '1',
     name: 'App-Entwicklung Frühchen Schweiz',
-    status: 'active' as ProjectStatus,
+    status: 'active',
     progress: 35,
     lead: 'Dina Hediger',
     team: ['Dina Hediger', 'Mario Bühler', 'Codazure'],
@@ -27,7 +40,7 @@ const PROJECTS = [
   {
     id: '2',
     name: 'Weltfrühgeborenentag 2026',
-    status: 'planning' as ProjectStatus,
+    status: 'planning',
     progress: 15,
     lead: 'Sandra Meier',
     team: ['Sandra Meier', 'Désirée Koch', 'Nadine Vogt'],
@@ -38,7 +51,7 @@ const PROJECTS = [
   {
     id: '3',
     name: 'Peer-Ausbildung Zürich',
-    status: 'active' as ProjectStatus,
+    status: 'active',
     progress: 60,
     lead: 'Sandra Meier',
     team: ['Sandra Meier', 'Claudia Weber'],
@@ -49,7 +62,7 @@ const PROJECTS = [
   {
     id: '4',
     name: 'Jahresbericht 2025',
-    status: 'active' as ProjectStatus,
+    status: 'active',
     progress: 75,
     lead: 'Désirée Koch',
     team: ['Désirée Koch', 'Dina Hediger'],
@@ -60,7 +73,7 @@ const PROJECTS = [
   {
     id: '5',
     name: 'Trust.ai Pilotprojekt',
-    status: 'paused' as ProjectStatus,
+    status: 'paused',
     progress: 20,
     lead: 'Dina Hediger',
     team: ['Dina Hediger'],
@@ -70,7 +83,7 @@ const PROJECTS = [
   },
 ];
 
-const statusConfig = {
+const statusConfig: Record<ProjectStatus, { label: string; color: string }> = {
   active: { label: 'Aktiv', color: 'green' },
   planning: { label: 'Planung', color: 'blue' },
   completed: { label: 'Abgeschlossen', color: 'gray' },
@@ -79,6 +92,7 @@ const statusConfig = {
 
 export default function ProjectsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const filtered = statusFilter === 'all' ? PROJECTS : PROJECTS.filter((p) => p.status === statusFilter);
 
@@ -114,7 +128,7 @@ export default function ProjectsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 * i }}
           >
-            <Card interactive className="space-y-4">
+            <Card interactive className="space-y-4 cursor-pointer" onClick={() => setSelectedProject(project)}>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
@@ -162,6 +176,62 @@ export default function ProjectsPage() {
           </motion.div>
         ))}
       </div>
+
+      {/* Project detail modal */}
+      <Modal open={!!selectedProject} onClose={() => setSelectedProject(null)} title={selectedProject?.name || ''} size="lg">
+        {selectedProject && (
+          <div className="space-y-6">
+            <div className="flex flex-wrap items-center gap-3">
+              <Badge variant={statusConfig[selectedProject.status].color as any}>
+                {statusConfig[selectedProject.status].label}
+              </Badge>
+              <span className="text-sm text-gray-500">
+                Deadline: {new Date(selectedProject.deadline).toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' })}
+              </span>
+            </div>
+
+            <p className="text-sm text-gray-700 leading-relaxed">{selectedProject.description}</p>
+
+            <div>
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span className="text-gray-500">Fortschritt</span>
+                <span className="text-gray-700 font-medium">{selectedProject.tasks.done}/{selectedProject.tasks.total} Aufgaben</span>
+              </div>
+              <ProgressBar
+                value={selectedProject.progress}
+                color={selectedProject.progress >= 75 ? 'green' : selectedProject.progress >= 50 ? 'brand' : 'violet'}
+                showLabel
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Projektleitung</p>
+                <div className="flex items-center gap-2">
+                  <Avatar name={selectedProject.lead} size="sm" />
+                  <p className="text-sm text-gray-900">{selectedProject.lead}</p>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Status</p>
+                <p className="text-sm text-gray-900">{statusConfig[selectedProject.status].label}</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Team</p>
+              <div className="flex flex-wrap gap-2">
+                {selectedProject.team.map((member) => (
+                  <div key={member} className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2">
+                    <Avatar name={member} size="sm" />
+                    <span className="text-sm text-gray-700">{member}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

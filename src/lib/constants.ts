@@ -91,6 +91,11 @@ export const NAV_ITEMS = {
     { href: '/admin/projects', label: 'Projekte', icon: 'FolderKanban' },
     { href: '/admin/volunteers', label: 'Freiwillige', icon: 'UserCheck' },
     { href: '/admin/time-tracking', label: 'Zeiterfassung', icon: 'Timer' },
+    { href: '/admin/events', label: 'Events', icon: 'Calendar' },
+    { href: '/admin/media', label: 'Medien', icon: 'Play' },
+    { href: '/admin/glossary', label: 'Glossar', icon: 'BookOpen' },
+    { href: '/admin/peers', label: 'Peers', icon: 'Users' },
+    { href: '/admin/hospitals', label: 'Spitäler', icon: 'Building2' },
     { href: '/admin/analytics', label: 'Analytik', icon: 'TrendingUp' },
   ],
 } as const;

@@ -8,8 +8,19 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/avatar';
 import { PageHeader } from '@/components/layout/page-header';
+import { Modal } from '@/components/ui/modal';
 
-const PEERS = [
+interface Peer {
+  id: string;
+  name: string;
+  region: string;
+  topics: string[];
+  available: boolean;
+  avatar: string | null;
+  bio: string;
+}
+
+const PEERS: Peer[] = [
   {
     id: '1',
     name: 'Maria Keller',
@@ -223,6 +234,7 @@ function ConversationView({
 export default function PeerPage() {
   const [selectedTopic, setSelectedTopic] = useState('Alle');
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
+  const [selectedPeer, setSelectedPeer] = useState<Peer | null>(null);
 
   const filteredPeers =
     selectedTopic === 'Alle'
@@ -320,7 +332,7 @@ export default function PeerPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 * i }}
           >
-            <Card className="space-y-3">
+            <Card className="space-y-3 cursor-pointer" onClick={() => setSelectedPeer(peer)}>
               <div className="flex items-start gap-3">
                 <Avatar name={peer.name} size="lg" />
                 <div className="flex-1">
@@ -348,10 +360,25 @@ export default function PeerPage() {
                 ))}
               </div>
               <div className="flex gap-2 pt-1">
-                <Button variant="primary" size="sm" icon="MessageCircle" fullWidth disabled={!peer.available}>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  icon="MessageCircle"
+                  fullWidth
+                  disabled={!peer.available}
+                  onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                >
                   Nachricht senden
                 </Button>
-                <Button variant="secondary" size="sm" icon="User">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  icon="User"
+                  onClick={(e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    setSelectedPeer(peer);
+                  }}
+                >
                   Profil
                 </Button>
               </div>
@@ -373,6 +400,105 @@ export default function PeerPage() {
           </div>
         </div>
       </Card>
+
+      {/* ------------------------------------------------------------------ */}
+      {/*  Peer Profile Detail Modal                                         */}
+      {/* ------------------------------------------------------------------ */}
+      <Modal
+        open={!!selectedPeer}
+        onClose={() => setSelectedPeer(null)}
+        title="Peer-Profil"
+        size="md"
+      >
+        {selectedPeer && (
+          <div className="space-y-5">
+            {/* Avatar and name */}
+            <div className="flex items-center gap-4">
+              <Avatar name={selectedPeer.name} size="xl" />
+              <div className="flex-1 min-w-0">
+                <h3 className="text-xl font-bold text-gray-900">
+                  {selectedPeer.name}
+                </h3>
+                <div className="flex items-center gap-2 mt-1">
+                  {selectedPeer.available ? (
+                    <span className="flex items-center gap-1.5 text-sm text-emerald-600 font-medium">
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Online - Erreichbar
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1.5 text-sm text-gray-400 font-medium">
+                      <div className="w-2.5 h-2.5 rounded-full bg-gray-300" />
+                      Zurzeit offline
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Detail fields */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 text-sm">
+                <div className="w-8 h-8 rounded-xl bg-brand-50 flex items-center justify-center flex-shrink-0">
+                  <Icon name="MapPin" size={16} className="text-brand-500" />
+                </div>
+                <div>
+                  <p className="text-gray-500 text-xs font-medium">Region</p>
+                  <p className="text-gray-900 font-medium">{selectedPeer.region}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bio */}
+            <div>
+              <p className="text-xs font-medium text-gray-500 mb-1.5">Über mich</p>
+              <p className="text-sm text-gray-700 leading-relaxed">
+                {selectedPeer.bio}
+              </p>
+            </div>
+
+            {/* Topics */}
+            <div>
+              <p className="text-xs font-medium text-gray-500 mb-2">Themen</p>
+              <div className="flex flex-wrap gap-2">
+                {selectedPeer.topics.map((topic) => (
+                  <Badge key={topic} variant="violet">
+                    {topic}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Availability */}
+            <div>
+              <p className="text-xs font-medium text-gray-500 mb-1.5">Verfügbarkeit</p>
+              <div className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium ${
+                selectedPeer.available
+                  ? 'bg-emerald-50 text-emerald-700'
+                  : 'bg-gray-50 text-gray-500'
+              }`}>
+                <div className={`w-2 h-2 rounded-full ${
+                  selectedPeer.available ? 'bg-emerald-500 animate-pulse' : 'bg-gray-300'
+                }`} />
+                {selectedPeer.available
+                  ? 'Aktuell erreichbar für Gespräche'
+                  : 'Zurzeit nicht verfügbar'}
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="pt-2">
+              <Button
+                size="lg"
+                icon="MessageCircle"
+                fullWidth
+                disabled={!selectedPeer.available}
+              >
+                Nachricht senden
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

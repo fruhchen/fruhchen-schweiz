@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SearchInput } from '@/components/ui/search-input';
 import { PageHeader } from '@/components/layout/page-header';
+import { Modal } from '@/components/ui/modal';
 
 type MediaType = 'all' | 'video' | 'podcast' | 'webinar' | 'article';
 
@@ -101,9 +102,17 @@ const typeIcons = {
   article: 'FileText',
 } as const;
 
+const typeLabels: Record<string, string> = {
+  video: 'Video',
+  podcast: 'Podcast',
+  webinar: 'Webinar',
+  article: 'Artikel',
+};
+
 export default function MediaPage() {
   const [search, setSearch] = useState('');
   const [activeType, setActiveType] = useState<MediaType>('all');
+  const [selectedMedia, setSelectedMedia] = useState<(typeof MEDIA_ITEMS)[number] | null>(null);
 
   const filtered = MEDIA_ITEMS.filter((item) => {
     const matchesType = activeType === 'all' || item.type === activeType;
@@ -146,7 +155,10 @@ export default function MediaPage() {
       {/* Featured */}
       {featuredItem && activeType === 'all' && !search && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <Card className="overflow-hidden p-0">
+          <Card
+            className="overflow-hidden p-0 cursor-pointer"
+            onClick={() => setSelectedMedia(featuredItem)}
+          >
             <div className="relative h-48 bg-gradient-to-br from-rose-400 to-brand-500 flex items-center justify-center">
               <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
                 <Icon name="Play" size={32} className="text-white ml-1" />
@@ -178,7 +190,11 @@ export default function MediaPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 * i }}
             >
-              <Card interactive className="space-y-3">
+              <Card
+                interactive
+                className="space-y-3 cursor-pointer"
+                onClick={() => setSelectedMedia(item)}
+              >
                 <div className="relative h-32 -mx-6 -mt-6 rounded-t-3xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                   <div className="w-12 h-12 rounded-full bg-white/80 shadow-soft flex items-center justify-center">
                     <Icon
@@ -201,6 +217,84 @@ export default function MediaPage() {
             </motion.div>
           ))}
       </div>
+
+      {/* Media detail modal */}
+      <Modal
+        open={!!selectedMedia}
+        onClose={() => setSelectedMedia(null)}
+        title="Medien-Details"
+        size="md"
+      >
+        {selectedMedia && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className={`w-12 h-12 rounded-xl bg-${typeColors[selectedMedia.type]}-50 flex items-center justify-center flex-shrink-0`}>
+                <Icon
+                  name={typeIcons[selectedMedia.type] as any}
+                  size={22}
+                  className={`text-${typeColors[selectedMedia.type]}-500`}
+                />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">{selectedMedia.title}</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <Badge variant={typeColors[selectedMedia.type]}>
+                    {typeLabels[selectedMedia.type] ?? selectedMedia.type}
+                  </Badge>
+                  <Badge variant="gray">{selectedMedia.category}</Badge>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3 bg-gray-50 rounded-2xl p-4">
+              <div className="flex items-center gap-3">
+                <Icon name={typeIcons[selectedMedia.type] as any} size={16} className="text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-400">Typ</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {typeLabels[selectedMedia.type] ?? selectedMedia.type}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Icon name="Clock" size={16} className="text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-400">Dauer</p>
+                  <p className="text-sm font-medium text-gray-900">{selectedMedia.duration}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Icon name="Tag" size={16} className="text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-400">Kategorie</p>
+                  <p className="text-sm font-medium text-gray-900">{selectedMedia.category}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Icon name="Calendar" size={16} className="text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-400">Datum</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {new Date(selectedMedia.date).toLocaleDateString('de-CH', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200/50 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Icon name="FileText" size={14} className="text-blue-500" />
+                <span className="text-xs font-medium text-blue-700">Beschreibung</span>
+              </div>
+              <p className="text-sm text-blue-900 leading-relaxed">{selectedMedia.description}</p>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

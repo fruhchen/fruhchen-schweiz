@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/layout/page-header';
+import { Modal } from '@/components/ui/modal';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -132,6 +133,16 @@ function formatDate(dateStr: string): string {
   });
 }
 
+function formatFullDate(dateStr: string): string {
+  const date = new Date(dateStr + 'T00:00:00');
+  return date.toLocaleDateString('de-CH', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
 function groupByDate(entries: JournalEntry[]): Record<string, JournalEntry[]> {
   return entries.reduce(
     (groups, entry) => {
@@ -203,12 +214,18 @@ function PhotoGrid({ count }: { count: number }) {
 
 // ── Entry card ───────────────────────────────────────────────────────────────
 
-function EntryCard({ entry }: { entry: JournalEntry }) {
+function EntryCard({
+  entry,
+  onSelect,
+}: {
+  entry: JournalEntry;
+  onSelect: (entry: JournalEntry) => void;
+}) {
   const mood = MOODS[entry.mood];
 
   return (
     <motion.div variants={itemVariants}>
-      <Card interactive className="relative overflow-hidden">
+      <Card interactive className="relative overflow-hidden cursor-pointer" onClick={() => onSelect(entry)}>
         {/* Milestone ribbon */}
         {entry.milestone && (
           <div className="absolute top-0 right-0">
@@ -260,6 +277,7 @@ function EntryCard({ entry }: { entry: JournalEntry }) {
 
 export default function JournalPage() {
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
+  const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
 
   const filteredEntries = MOCK_ENTRIES.filter((entry) => {
     if (activeFilter === 'entries') return entry.type === 'entry';
@@ -342,7 +360,7 @@ export default function JournalPage() {
                     <div key={entry.id} className="relative pl-10">
                       {/* Timeline dot */}
                       <div className="absolute left-[14px] top-5 w-2.5 h-2.5 rounded-full bg-white border-2 border-brand-300 z-10" />
-                      <EntryCard entry={entry} />
+                      <EntryCard entry={entry} onSelect={setSelectedEntry} />
                     </div>
                   ))}
                 </div>
@@ -377,6 +395,102 @@ export default function JournalPage() {
           <Icon name="Plus" size={24} strokeWidth={2.5} />
         </motion.div>
       </Link>
+
+      {/* ------------------------------------------------------------------ */}
+      {/*  Entry Detail Modal                                                */}
+      {/* ------------------------------------------------------------------ */}
+      <Modal
+        open={!!selectedEntry}
+        onClose={() => setSelectedEntry(null)}
+        title="Tagebuch-Eintrag"
+        size="md"
+      >
+        {selectedEntry && (() => {
+          const mood = MOODS[selectedEntry.mood];
+          return (
+            <div className="space-y-5">
+              {/* Title and mood */}
+              <div className="flex items-start gap-4">
+                <div className="flex flex-col items-center gap-1 flex-shrink-0">
+                  <div
+                    className={`w-12 h-12 rounded-full ${mood.bg} flex items-center justify-center text-2xl`}
+                  >
+                    {mood.emoji}
+                  </div>
+                  <span className={`text-xs font-medium ${mood.color}`}>{mood.label}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">
+                    {selectedEntry.title}
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {selectedEntry.milestone && (
+                      <Badge variant="yellow">
+                        <Icon name="Star" size={12} className="text-amber-500" />
+                        {selectedEntry.milestone}
+                      </Badge>
+                    )}
+                    {selectedEntry.type === 'milestone' && !selectedEntry.milestone && (
+                      <Badge variant="yellow">Meilenstein</Badge>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Date and time */}
+              <div className="flex gap-4">
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="w-8 h-8 rounded-xl bg-brand-50 flex items-center justify-center flex-shrink-0">
+                    <Icon name="CalendarDays" size={16} className="text-brand-500" />
+                  </div>
+                  <div>
+                    <p className="text-gray-500 text-xs font-medium">Datum</p>
+                    <p className="text-gray-900 font-medium">{formatFullDate(selectedEntry.date)}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="w-8 h-8 rounded-xl bg-violet-50 flex items-center justify-center flex-shrink-0">
+                    <Icon name="Clock" size={16} className="text-violet-500" />
+                  </div>
+                  <div>
+                    <p className="text-gray-500 text-xs font-medium">Uhrzeit</p>
+                    <p className="text-gray-900 font-medium">{selectedEntry.time} Uhr</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Full text */}
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1.5">Eintrag</p>
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  {selectedEntry.excerpt}
+                </p>
+              </div>
+
+              {/* Photos */}
+              {selectedEntry.photos > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-2">
+                    Fotos ({selectedEntry.photos})
+                  </p>
+                  <PhotoGrid count={selectedEntry.photos} />
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <Button variant="secondary" size="md" icon="Pencil" fullWidth>
+                  Bearbeiten
+                </Button>
+                <Button variant="secondary" size="md" icon="Share2" fullWidth>
+                  Teilen
+                </Button>
+              </div>
+            </div>
+          );
+        })()}
+      </Modal>
     </>
   );
 }
