@@ -22,9 +22,7 @@ export function TopBar({ userName, title, showBack, backHref = '/dashboard' }: T
               <Icon name="ChevronLeft" size={24} />
             </Link>
           ) : (
-            <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center">
-              <Icon name="Heart" size={16} className="text-white" />
-            </div>
+            <img src="/fruhchen_neokinder_logo.svg" alt="Frühchen & Neokinder" className="h-8 w-auto" />
           )}
           {title ? (
             <h1 className="font-semibold text-gray-900">{title}</h1>

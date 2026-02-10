@@ -32,13 +32,13 @@ export function Sidebar({ userName, userRole, isAdmin }: SidebarProps) {
     >
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-5 border-b border-gray-100">
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center flex-shrink-0">
-          <Icon name="Heart" size={20} className="text-white" />
-        </div>
-        {!collapsed && (
+        {collapsed ? (
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center flex-shrink-0">
+            <Icon name="Heart" size={20} className="text-white" />
+          </div>
+        ) : (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-w-0">
-            <h1 className="font-bold text-gray-900 text-sm truncate">Frühchen Schweiz</h1>
-            <p className="text-xs text-gray-400 truncate">Gemeinsam stark</p>
+            <img src="/fruhchen_neokinder_logo.svg" alt="Frühchen & Neokinder Schweiz" className="h-12 w-auto" />
           </motion.div>
         )}
       </div>

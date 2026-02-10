@@ -29,8 +29,8 @@ interface Message {
 
 const SUGGESTION_CHIPS = [
   'Was bedeutet CPAP?',
-  'Tipps fur Kanguru-Pflege',
-  'Fragen fur die nachste Visite',
+  'Tipps für Känguru-Pflege',
+  'Fragen für die nächste Visite',
   'Wie berechne ich das korrigierte Alter?',
 ] as const;
 
@@ -38,14 +38,14 @@ const INITIAL_MESSAGES: Message[] = [
   {
     id: '1',
     role: 'user',
-    content: 'Was ist Kanguru-Pflege?',
+    content: 'Was ist Känguru-Pflege?',
     timestamp: new Date(Date.now() - 60_000 * 5),
   },
   {
     id: '2',
     role: 'assistant',
     content:
-      'Kanguru-Pflege (auch Kangaroo Mother Care genannt) ist eine wunderbare Methode, bei der dein Fruhchen direkten Haut-zu-Haut-Kontakt mit dir hat. Dein Baby wird dabei nur mit einer Windel bekleidet aufrecht auf deine nackte Brust gelegt und mit einem Tuch oder einer Decke zugedeckt.\n\nDie Vorteile sind beeindruckend:\n\n- Stabilisiert Herzschlag und Atmung deines Babys\n- Reguliert die Korpertemperatur naturlich\n- Fordert die Gewichtszunahme\n- Starkt die Eltern-Kind-Bindung\n- Reduziert Stress -- bei dir und deinem Baby\n- Unterstutzt die Muttermilchproduktion\n\nDu kannst schon sehr fruh damit beginnen -- oft bereits auf der Neonatologie. Sprich dein Pflegeteam einfach an, sie helfen dir, die erste Kanguru-Sitzung einzurichten. Selbst 30 Minuten konnen schon einen grossen Unterschied machen.',
+      'Känguru-Pflege (auch Kangaroo Mother Care genannt) ist eine wunderbare Methode, bei der dein Frühchen direkten Haut-zu-Haut-Kontakt mit dir hat. Dein Baby wird dabei nur mit einer Windel bekleidet aufrecht auf deine nackte Brust gelegt und mit einem Tuch oder einer Decke zugedeckt.\n\nDie Vorteile sind beeindruckend:\n\n- Stabilisiert Herzschlag und Atmung deines Babys\n- Reguliert die Körpertemperatur natürlich\n- Fördert die Gewichtszunahme\n- Stärkt die Eltern-Kind-Bindung\n- Reduziert Stress — bei dir und deinem Baby\n- Unterstützt die Muttermilchproduktion\n\nDu kannst schon sehr früh damit beginnen — oft bereits auf der Neonatologie. Sprich dein Pflegeteam einfach an, sie helfen dir, die erste Känguru-Sitzung einzurichten. Selbst 30 Minuten können schon einen grossen Unterschied machen.',
     sources: [
       { label: 'fruehchenschweiz.ch/glossar', url: 'https://fruehchenschweiz.ch/glossar' },
       { label: 'fruehchenschweiz.ch/stillen', url: 'https://fruehchenschweiz.ch/stillen' },
@@ -57,7 +57,7 @@ const INITIAL_MESSAGES: Message[] = [
 const MOCK_RESPONSES: Record<string, { content: string; sources: Source[] }> = {
   default: {
     content:
-      'Das ist eine tolle Frage! Basierend auf den Informationen von Fruhchen Schweiz kann ich dir Folgendes sagen:\n\nEs ist vollig normal, sich als Elternteil eines Fruhchens manchmal unsicher zu fuhlen. Wichtig ist, dass du dir Unterstutzung holst -- sei es vom Pflegeteam, von anderen betroffenen Eltern oder von Fachpersonen.\n\nDenk daran: Jedes Fruhchen entwickelt sich in seinem eigenen Tempo. Kleine Fortschritte sind grosse Meilensteine. Du machst das grossartig!',
+      'Das ist eine tolle Frage! Basierend auf den Informationen von Frühchen Schweiz kann ich dir Folgendes sagen:\n\nEs ist völlig normal, sich als Elternteil eines Frühchens manchmal unsicher zu fühlen. Wichtig ist, dass du dir Unterstützung holst — sei es vom Pflegeteam, von anderen betroffenen Eltern oder von Fachpersonen.\n\nDenk daran: Jedes Frühchen entwickelt sich in seinem eigenen Tempo. Kleine Fortschritte sind grosse Meilensteine. Du machst das grossartig!',
     sources: [
       { label: 'fruehchenschweiz.ch/eltern', url: 'https://fruehchenschweiz.ch/eltern' },
       { label: 'fruehchenschweiz.ch/faq', url: 'https://fruehchenschweiz.ch/faq' },
@@ -227,8 +227,8 @@ function WelcomeState({ onSuggestionClick }: { onSuggestionClick: (text: string)
 
       <h2 className="text-heading text-gray-900 mb-2">Hallo! Wie kann ich helfen?</h2>
       <p className="text-sm text-gray-500 max-w-xs mb-8 leading-relaxed">
-        Ich beantworte deine Fragen rund ums Thema Fruhgeburt -- basierend auf verlasslichen
-        Inhalten von Fruhchen Schweiz.
+        Ich beantworte deine Fragen rund ums Thema Frühgeburt — basierend auf verlässlichen
+        Inhalten von Frühchen Schweiz.
       </p>
 
       {/* Suggestion chips */}
@@ -326,7 +326,7 @@ export default function ChatPage() {
         <p className="text-[11px] text-gray-500 flex items-center justify-center gap-2 flex-wrap">
           <span className="inline-flex items-center gap-1">
             <Icon name="Sparkles" size={11} className="text-brand-400" />
-            AI-gestutzt
+            AI-gestützt
           </span>
           <span className="text-gray-300">|</span>
           <span>Basierend auf Inhalten von fruehchenschweiz.ch</span>
@@ -339,10 +339,10 @@ export default function ChatPage() {
       <div className="bg-white/80 backdrop-blur-lg border-b border-gray-100 px-4 py-3 flex items-center gap-3 flex-shrink-0">
         <AiAvatar />
         <div className="flex-1 min-w-0">
-          <h1 className="text-base font-semibold text-gray-900">Fruhchen Assistent</h1>
+          <h1 className="text-base font-semibold text-gray-900">Frühchen Assistent</h1>
           <p className="text-xs text-gray-400 flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-            Immer fur dich da
+            Immer für dich da
           </p>
         </div>
         <button

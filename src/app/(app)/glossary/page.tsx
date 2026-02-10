@@ -13,7 +13,7 @@ import { PageHeader } from '@/components/layout/page-header';
 // Types
 // ---------------------------------------------------------------------------
 
-type Category = 'Atmung' | 'Ernaehrung' | 'Entwicklung' | 'Diagnostik' | 'Pflege' | 'Medikamente';
+type Category = 'Atmung' | 'Ernährung' | 'Entwicklung' | 'Diagnostik' | 'Pflege' | 'Medikamente';
 
 interface GlossaryTerm {
   id: string;
@@ -31,7 +31,7 @@ interface GlossaryTerm {
 
 const categoryBadgeVariant: Record<Category, 'brand' | 'violet' | 'teal' | 'rose' | 'green' | 'blue'> = {
   Atmung: 'brand',
-  Ernaehrung: 'teal',
+  Ernährung: 'teal',
   Entwicklung: 'violet',
   Diagnostik: 'blue',
   Pflege: 'rose',
@@ -40,7 +40,7 @@ const categoryBadgeVariant: Record<Category, 'brand' | 'violet' | 'teal' | 'rose
 
 const categoryLabel: Record<Category, string> = {
   Atmung: 'Atmung',
-  Ernaehrung: 'Ernaehrung',
+  Ernährung: 'Ernährung',
   Entwicklung: 'Entwicklung',
   Diagnostik: 'Diagnostik',
   Pflege: 'Pflege',
@@ -58,10 +58,10 @@ const glossaryTerms: GlossaryTerm[] = [
     subtitle: 'Continuous Positive Airway Pressure',
     category: 'Atmung',
     definition:
-      'Eine nicht-invasive Atemunterstuetzung, bei der ein kontinuierlicher positiver Druck ueber eine Nasenmaske oder -brille auf die Atemwege des Babys ausgeubt wird, um die Lungen offen zu halten.',
+      'Eine nicht-invasive Atemunterstützung, bei der ein kontinuierlicher positiver Druck über eine Nasenmaske oder -brille auf die Atemwege des Babys ausgeübt wird, um die Lungen offen zu halten.',
     simpleExplanation:
-      'Eine sanfte Atemhilfe: Ueber eine kleine Maske oder Nasenstuecke wird leichter Luftdruck in die Lunge Ihres Babys geblasen. Das hilft, die winzigen Lungenblaeschen offen zu halten, damit Ihr Baby leichter atmen kann. Ihr Baby atmet dabei selbst -- die Maschine hilft nur mit.',
-    relatedTerms: ['Surfactant', 'Sauerstoffsaettigung (SpO2)', 'Apnoe'],
+      'Eine sanfte Atemhilfe: Über eine kleine Maske oder Nasenstücke wird leichter Luftdruck in die Lunge Ihres Babys geblasen. Das hilft, die winzigen Lungenbläschen offen zu halten, damit Ihr Baby leichter atmen kann. Ihr Baby atmet dabei selbst — die Maschine hilft nur mit.',
+    relatedTerms: ['Surfactant', 'Sauerstoffsättigung (SpO2)', 'Apnoe'],
   },
   {
     id: 'apnoe',
@@ -69,10 +69,10 @@ const glossaryTerms: GlossaryTerm[] = [
     subtitle: 'Atemaussetzer',
     category: 'Atmung',
     definition:
-      'Ein voruebergehender Atemstillstand von mehr als 20 Sekunden oder kuerzer mit begleitender Bradykardie oder Zyanose. Haeufig bei Fruehgeborenen unter 34 SSW aufgrund der Unreife des Atemzentrums.',
+      'Ein vorübergehender Atemstillstand von mehr als 20 Sekunden oder kürzer mit begleitender Bradykardie oder Zyanose. Häufig bei Frühgeborenen unter 34 SSW aufgrund der Unreife des Atemzentrums.',
     simpleExplanation:
-      'Manchmal vergisst Ihr Baby kurz zu atmen -- das ist bei Fruehchen ganz normal und liegt daran, dass das Gehirn noch lernt, die Atmung zu steuern. Die Monitore auf der Station erkennen das sofort und die Pflegekraefte reagieren schnell. Meistens reicht eine sanfte Beruehrung und Ihr Baby atmet von selbst wieder.',
-    relatedTerms: ['Bradykardie', 'CPAP', 'Sauerstoffsaettigung (SpO2)'],
+      'Manchmal vergisst Ihr Baby kurz zu atmen — das ist bei Frühchen ganz normal und liegt daran, dass das Gehirn noch lernt, die Atmung zu steuern. Die Monitore auf der Station erkennen das sofort und die Pflegekräfte reagieren schnell. Meistens reicht eine sanfte Berührung und Ihr Baby atmet von selbst wieder.',
+    relatedTerms: ['Bradykardie', 'CPAP', 'Sauerstoffsättigung (SpO2)'],
   },
   {
     id: 'bradykardie',
@@ -80,10 +80,10 @@ const glossaryTerms: GlossaryTerm[] = [
     subtitle: 'Verlangsamter Herzschlag',
     category: 'Atmung',
     definition:
-      'Eine Verlangsamung der Herzfrequenz unter 100 Schlaege pro Minute beim Neugeborenen. Tritt haeufig zusammen mit Apnoen auf und wird als "Brady" bezeichnet.',
+      'Eine Verlangsamung der Herzfrequenz unter 100 Schläge pro Minute beim Neugeborenen. Tritt häufig zusammen mit Apnoen auf und wird als «Brady» bezeichnet.',
     simpleExplanation:
-      'Wenn das Herz Ihres Babys kurzzeitig etwas langsamer schlaegt als normal. Das passiert oft zusammen mit Atempausen. Die Schwestern nennen das liebevoll "Brady". Der Monitor piepst dann, aber meistens erholt sich Ihr Baby ganz schnell von allein oder mit einer sanften Beruehrung.',
-    relatedTerms: ['Apnoe', 'Sauerstoffsaettigung (SpO2)'],
+      'Wenn das Herz Ihres Babys kurzzeitig etwas langsamer schlägt als normal. Das passiert oft zusammen mit Atempausen. Die Schwestern nennen das liebevoll «Brady». Der Monitor piepst dann, aber meistens erholt sich Ihr Baby ganz schnell von allein oder mit einer sanften Berührung.',
+    relatedTerms: ['Apnoe', 'Sauerstoffsättigung (SpO2)'],
   },
   {
     id: 'bilirubin',
@@ -91,9 +91,9 @@ const glossaryTerms: GlossaryTerm[] = [
     subtitle: 'Gelbsucht-Wert',
     category: 'Diagnostik',
     definition:
-      'Ein Abbauprodukt des roten Blutfarbstoffs Haemoglobin. Erhoehte Werte fuehren zur Neugeborenengelbsucht (Ikterus neonatorum) mit gelblicher Verfaerbung der Haut.',
+      'Ein Abbauprodukt des roten Blutfarbstoffs Hämoglobin. Erhöhte Werte führen zur Neugeborenengelbsucht (Ikterus neonatorum) mit gelblicher Verfärbung der Haut.',
     simpleExplanation:
-      'Wenn rote Blutkoerperchen abgebaut werden, entsteht ein gelber Farbstoff. Bei Babys kann die Leber diesen Stoff noch nicht so gut verarbeiten, deshalb kann die Haut gelblich werden. Das ist sehr haeufig und wird mit speziellem Licht (Phototherapie) behandelt.',
+      'Wenn rote Blutkörperchen abgebaut werden, entsteht ein gelber Farbstoff. Bei Babys kann die Leber diesen Stoff noch nicht so gut verarbeiten, deshalb kann die Haut gelblich werden. Das ist sehr häufig und wird mit speziellem Licht (Phototherapie) behandelt.',
     relatedTerms: ['Phototherapie'],
   },
   {
@@ -102,20 +102,20 @@ const glossaryTerms: GlossaryTerm[] = [
     subtitle: 'Brutkasten',
     category: 'Pflege',
     definition:
-      'Ein geschlossenes Waermebett mit regulierbarer Temperatur, Luftfeuchtigkeit und Sauerstoffzufuhr. Schuetzt das Fruehgeborene vor Waermeverlust, Infektionen und aeusseren Reizen.',
+      'Ein geschlossenes Wärmebett mit regulierbarer Temperatur, Luftfeuchtigkeit und Sauerstoffzufuhr. Schützt das Frühgeborene vor Wärmeverlust, Infektionen und äusseren Reizen.',
     simpleExplanation:
-      'Ein warmes, geschuetztes Bettchen aus durchsichtigem Kunststoff -- wie ein kleines Gewaechshaus fuer Ihr Baby. Darin ist es immer schoen warm und feucht, so wie es im Bauch war. Sie koennen Ihr Baby durch Oeffnungen an der Seite beruehren und streicheln.',
-    relatedTerms: ['Kaenguru-Pflege'],
+      'Ein warmes, geschütztes Bettchen aus durchsichtigem Kunststoff — wie ein kleines Gewächshaus für Ihr Baby. Darin ist es immer schön warm und feucht, so wie es im Bauch war. Sie können Ihr Baby durch Öffnungen an der Seite berühren und streicheln.',
+    relatedTerms: ['Känguru-Pflege'],
   },
   {
     id: 'kaenguru-pflege',
-    term: 'Kaenguru-Pflege',
+    term: 'Känguru-Pflege',
     subtitle: 'Kangaroo Care',
     category: 'Pflege',
     definition:
-      'Haut-zu-Haut-Kontakt zwischen Elternteil und Fruehgeborenem. Das Baby liegt nur mit Windel bekleidet auf der nackten Brust. Foerdert Bindung, Waermeregulation, Stillen und Entwicklung.',
+      'Haut-zu-Haut-Kontakt zwischen Elternteil und Frühgeborenem. Das Baby liegt nur mit Windel bekleidet auf der nackten Brust. Fördert Bindung, Wärmeregulation, Stillen und Entwicklung.',
     simpleExplanation:
-      'Ihr Baby liegt nur mit Windel direkt auf Ihrer nackten Brust, Haut an Haut. Das ist eines der besten Dinge, die Sie fuer Ihr Fruehchen tun koennen! Ihr Baby hoert Ihren Herzschlag, riecht Sie und fuehlt sich sicher. Es hilft bei der Entwicklung, beim Wachstum und staerkt eure Bindung.',
+      'Ihr Baby liegt nur mit Windel direkt auf Ihrer nackten Brust, Haut an Haut. Das ist eines der besten Dinge, die Sie für Ihr Frühchen tun können! Ihr Baby hört Ihren Herzschlag, riecht Sie und fühlt sich sicher. Es hilft bei der Entwicklung, beim Wachstum und stärkt eure Bindung.',
     relatedTerms: ['Inkubator'],
   },
   {
@@ -123,31 +123,31 @@ const glossaryTerms: GlossaryTerm[] = [
     term: 'Surfactant',
     category: 'Medikamente',
     definition:
-      'Eine oberflaechenaktive Substanz, die die Alveolen (Lungenblaeschen) auskleidet und deren Zusammenfallen verhindert. Wird bei Atemnotsyndrom (RDS) direkt in die Lunge verabreicht.',
+      'Eine oberflächenaktive Substanz, die die Alveolen (Lungenbläschen) auskleidet und deren Zusammenfallen verhindert. Wird bei Atemnotsyndrom (RDS) direkt in die Lunge verabreicht.',
     simpleExplanation:
-      'Eine Art "Seife" fuer die Lunge: Normalerweise stellt die Lunge diesen Stoff selbst her, damit die winzigen Lungenblaeschen nicht zusammenkleben. Fruehchen haben davon oft noch zu wenig. Das Medikament wird ueber einen kleinen Schlauch direkt in die Lunge gegeben und hilft Ihrem Baby sofort besser zu atmen.',
-    relatedTerms: ['CPAP', 'Sauerstoffsaettigung (SpO2)'],
+      'Eine Art «Seife» für die Lunge: Normalerweise stellt die Lunge diesen Stoff selbst her, damit die winzigen Lungenbläschen nicht zusammenkleben. Frühchen haben davon oft noch zu wenig. Das Medikament wird über einen kleinen Schlauch direkt in die Lunge gegeben und hilft Ihrem Baby sofort besser zu atmen.',
+    relatedTerms: ['CPAP', 'Sauerstoffsättigung (SpO2)'],
   },
   {
     id: 'sonde',
     term: 'Sonde',
-    subtitle: 'Magensonde / Ernaehrungssonde',
-    category: 'Ernaehrung',
+    subtitle: 'Magensonde / Ernährungssonde',
+    category: 'Ernährung',
     definition:
-      'Ein duenner, flexibler Schlauch, der durch Nase oder Mund in den Magen gefuehrt wird, um Muttermilch oder Spezialnahrung direkt zuzufuehren, wenn das Baby noch nicht selbst trinken kann.',
+      'Ein dünner, flexibler Schlauch, der durch Nase oder Mund in den Magen geführt wird, um Muttermilch oder Spezialnahrung direkt zuzuführen, wenn das Baby noch nicht selbst trinken kann.',
     simpleExplanation:
-      'Ein winzig duenner, weicher Schlauch, der ueber die Nase in den Magen Ihres Babys fuehrt. Darueber bekommt Ihr Baby Ihre Muttermilch oder spezielle Nahrung, weil es noch zu klein ist, um selbst zu trinken. Das sieht vielleicht beaengstigend aus, tut Ihrem Baby aber nicht weh.',
-    relatedTerms: ['Fortifier', 'Kaenguru-Pflege'],
+      'Ein winzig dünner, weicher Schlauch, der über die Nase in den Magen Ihres Babys führt. Darüber bekommt Ihr Baby Ihre Muttermilch oder spezielle Nahrung, weil es noch zu klein ist, um selbst zu trinken. Das sieht vielleicht beängstigend aus, tut Ihrem Baby aber nicht weh.',
+    relatedTerms: ['Fortifier', 'Känguru-Pflege'],
   },
   {
     id: 'spo2',
-    term: 'Sauerstoffsaettigung',
+    term: 'Sauerstoffsättigung',
     subtitle: 'SpO2',
     category: 'Diagnostik',
     definition:
-      'Der Anteil des mit Sauerstoff beladenen Haemoglobins im Blut, gemessen per Pulsoximetrie. Normalwert bei Fruehgeborenen: 90-95%. Wird kontinuierlich ueberwacht.',
+      'Der Anteil des mit Sauerstoff beladenen Hämoglobins im Blut, gemessen per Pulsoximetrie. Normalwert bei Frühgeborenen: 90–95 %. Wird kontinuierlich überwacht.',
     simpleExplanation:
-      'Zeigt an, wie viel Sauerstoff im Blut Ihres Babys ist. Gemessen wird das mit einem kleinen Licht-Sensor, der am Fuss oder an der Hand Ihres Babys befestigt ist -- wie ein kleines Pflaesterchen mit rotem Licht. Die Zahl auf dem Monitor sollte meist zwischen 90 und 95 sein.',
+      'Zeigt an, wie viel Sauerstoff im Blut Ihres Babys ist. Gemessen wird das mit einem kleinen Licht-Sensor, der am Fuss oder an der Hand Ihres Babys befestigt ist — wie ein kleines Pflästerchen mit rotem Licht. Die Zahl auf dem Monitor sollte meist zwischen 90 und 95 sein.',
     relatedTerms: ['CPAP', 'Apnoe', 'Bradykardie'],
   },
   {
@@ -156,9 +156,9 @@ const glossaryTerms: GlossaryTerm[] = [
     subtitle: 'Schwangerschaftswochen (SSW)',
     category: 'Entwicklung',
     definition:
-      'Das Alter des Kindes berechnet ab dem ersten Tag der letzten Menstruation. Ein Vollzeitalter entspricht 40 Wochen. Fruehgeburt: vor vollendeter 37. SSW.',
+      'Das Alter des Kindes berechnet ab dem ersten Tag der letzten Menstruation. Ein Vollzeitalter entspricht 40 Wochen. Frühgeburt: vor vollendeter 37. SSW.',
     simpleExplanation:
-      'Wie viele Wochen Ihr Baby insgesamt im Bauch war. Eine normale Schwangerschaft dauert 40 Wochen. Wenn Aerzte sagen, Ihr Baby wurde in der 28. Woche geboren, war es 12 Wochen zu frueh. Diese Zahl ist wichtig, weil sie den Aerzten sagt, welche Organe schon wie weit entwickelt sind.',
+      'Wie viele Wochen Ihr Baby insgesamt im Bauch war. Eine normale Schwangerschaft dauert 40 Wochen. Wenn Ärzte sagen, Ihr Baby wurde in der 28. Woche geboren, war es 12 Wochen zu früh. Diese Zahl ist wichtig, weil sie den Ärzten sagt, welche Organe schon wie weit entwickelt sind.',
     relatedTerms: ['Korrigiertes Alter'],
   },
   {
@@ -166,9 +166,9 @@ const glossaryTerms: GlossaryTerm[] = [
     term: 'Korrigiertes Alter',
     category: 'Entwicklung',
     definition:
-      'Das Alter des Kindes, berechnet ab dem errechneten Geburtstermin (nicht dem tatsaechlichen Geburtsdatum). Wird fuer Entwicklungsbeurteilungen in den ersten 2-3 Lebensjahren verwendet.',
+      'Das Alter des Kindes, berechnet ab dem errechneten Geburtstermin (nicht dem tatsächlichen Geburtsdatum). Wird für Entwicklungsbeurteilungen in den ersten 2–3 Lebensjahren verwendet.',
     simpleExplanation:
-      'Stellen Sie sich vor, Ihr Baby waere zum errechneten Termin geboren worden -- das korrigierte Alter zaehlt ab diesem Datum. Wenn Ihr Baby 4 Monate alt ist, aber 2 Monate zu frueh kam, ist sein korrigiertes Alter 2 Monate. Das ist wichtig, weil man Entwicklungsschritte danach beurteilt.',
+      'Stellen Sie sich vor, Ihr Baby wäre zum errechneten Termin geboren worden — das korrigierte Alter zählt ab diesem Datum. Wenn Ihr Baby 4 Monate alt ist, aber 2 Monate zu früh kam, ist sein korrigiertes Alter 2 Monate. Das ist wichtig, weil man Entwicklungsschritte danach beurteilt.',
     relatedTerms: ['Gestationsalter'],
   },
   {
@@ -177,9 +177,9 @@ const glossaryTerms: GlossaryTerm[] = [
     subtitle: 'Lichttherapie',
     category: 'Diagnostik',
     definition:
-      'Behandlung der Neugeborenengelbsucht durch Bestrahlung mit blauem Licht (Wellenlaenge 430-490 nm). Das Licht wandelt das Bilirubin in der Haut in eine wasserloesliche Form um, die ausgeschieden werden kann.',
+      'Behandlung der Neugeborenengelbsucht durch Bestrahlung mit blauem Licht (Wellenlänge 430–490 nm). Das Licht wandelt das Bilirubin in der Haut in eine wasserlösliche Form um, die ausgeschieden werden kann.',
     simpleExplanation:
-      'Ihr Baby liegt unter einer speziellen blauen Lampe (manchmal auch auf einer leuchtenden Matte). Das blaue Licht hilft, den gelben Farbstoff in der Haut abzubauen. Ihr Baby traegt dabei eine kleine Augenmaske zum Schutz. Die Behandlung tut nicht weh und dauert meist nur wenige Tage.',
+      'Ihr Baby liegt unter einer speziellen blauen Lampe (manchmal auch auf einer leuchtenden Matte). Das blaue Licht hilft, den gelben Farbstoff in der Haut abzubauen. Ihr Baby trägt dabei eine kleine Augenmaske zum Schutz. Die Behandlung tut nicht weh und dauert meist nur wenige Tage.',
     relatedTerms: ['Bilirubin'],
   },
   {
@@ -188,9 +188,9 @@ const glossaryTerms: GlossaryTerm[] = [
     subtitle: 'PDA (Persistierender Ductus arteriosus)',
     category: 'Diagnostik',
     definition:
-      'Eine fetale Gefaessverbindung zwischen Aorta und Lungenarterie, die sich normalerweise nach der Geburt schliesst. Bei Fruehgeborenen kann sie offen bleiben (PDA) und muss ggf. medikamentoes oder chirurgisch verschlossen werden.',
+      'Eine fetale Gefässverbindung zwischen Aorta und Lungenarterie, die sich normalerweise nach der Geburt schliesst. Bei Frühgeborenen kann sie offen bleiben (PDA) und muss ggf. medikamentös oder chirurgisch verschlossen werden.',
     simpleExplanation:
-      'Im Mutterleib gibt es eine kleine Verbindung zwischen zwei grossen Blutgefaessen, weil das Baby dort noch nicht ueber die Lunge atmet. Nach der Geburt schliesst sich diese Verbindung normalerweise von selbst. Bei Fruehchen bleibt sie manchmal offen. Dann kann ein Medikament helfen, sie zu schliessen.',
+      'Im Mutterleib gibt es eine kleine Verbindung zwischen zwei grossen Blutgefässen, weil das Baby dort noch nicht über die Lunge atmet. Nach der Geburt schliesst sich diese Verbindung normalerweise von selbst. Bei Frühchen bleibt sie manchmal offen. Dann kann ein Medikament helfen, sie zu schliessen.',
     relatedTerms: ['Gestationsalter'],
   },
   {
@@ -199,20 +199,20 @@ const glossaryTerms: GlossaryTerm[] = [
     subtitle: 'ROP (Retinopathy of Prematurity)',
     category: 'Diagnostik',
     definition:
-      'Eine Erkrankung der Netzhaut bei Fruehgeborenen, bei der die Blutgefaesse der Netzhaut nicht normal ausreifen. Regelmaessige augenarztliche Kontrollen sind bei Fruehgeborenen unter 32 SSW oder unter 1500g erforderlich.',
+      'Eine Erkrankung der Netzhaut bei Frühgeborenen, bei der die Blutgefässe der Netzhaut nicht normal ausreifen. Regelmässige augenärztliche Kontrollen sind bei Frühgeborenen unter 32 SSW oder unter 1500 g erforderlich.',
     simpleExplanation:
-      'Die Blutgefaesse im Auge Ihres Babys sind noch nicht fertig gewachsen. Ein Augenarzt schaut regelmaessig nach, ob sich alles normal entwickelt. In den meisten Faellen heilt es von allein. Selten braucht es eine Behandlung. Die Untersuchung ist kurz und Ihr Baby wird gut betreut.',
-    relatedTerms: ['Gestationsalter', 'Sauerstoffsaettigung'],
+      'Die Blutgefässe im Auge Ihres Babys sind noch nicht fertig gewachsen. Ein Augenarzt schaut regelmässig nach, ob sich alles normal entwickelt. In den meisten Fällen heilt es von allein. Selten braucht es eine Behandlung. Die Untersuchung ist kurz und Ihr Baby wird gut betreut.',
+    relatedTerms: ['Gestationsalter', 'Sauerstoffsättigung'],
   },
   {
     id: 'fortifier',
     term: 'Fortifier',
-    subtitle: 'Muttermilchverstaerker',
-    category: 'Ernaehrung',
+    subtitle: 'Muttermilchverstärker',
+    category: 'Ernährung',
     definition:
-      'Ein Zusatz zur Muttermilch, der zusaetzliches Eiweiss, Kalorien, Mineralien und Vitamine liefert, um den erhoehten Naehrstoffbedarf von Fruehgeborenen zu decken.',
+      'Ein Zusatz zur Muttermilch, der zusätzliches Eiweiss, Kalorien, Mineralien und Vitamine liefert, um den erhöhten Nährstoffbedarf von Frühgeborenen zu decken.',
     simpleExplanation:
-      'Ein Pulver, das der Muttermilch beigemischt wird, um sie nahrhafter zu machen. Fruehchen brauchen extra viel Energie und Naehrstoffe zum Wachsen. Ihre Muttermilch ist schon das Beste fuer Ihr Baby -- der Fortifier macht sie sozusagen zu "Supermilch".',
+      'Ein Pulver, das der Muttermilch beigemischt wird, um sie nahrhafter zu machen. Frühchen brauchen extra viel Energie und Nährstoffe zum Wachsen. Ihre Muttermilch ist schon das Beste für Ihr Baby — der Fortifier macht sie sozusagen zu «Supermilch».',
     relatedTerms: ['Sonde'],
   },
 ];
@@ -224,7 +224,7 @@ const glossaryTerms: GlossaryTerm[] = [
 const allCategories: Array<Category | 'Alle'> = [
   'Alle',
   'Atmung',
-  'Ernaehrung',
+  'Ernährung',
   'Entwicklung',
   'Diagnostik',
   'Pflege',
@@ -234,7 +234,7 @@ const allCategories: Array<Category | 'Alle'> = [
 const categoryDisplayLabel: Record<Category | 'Alle', string> = {
   Alle: 'Alle',
   Atmung: 'Atmung',
-  Ernaehrung: 'Ernaehrung',
+  Ernährung: 'Ernährung',
   Entwicklung: 'Entwicklung',
   Diagnostik: 'Diagnostik',
   Pflege: 'Pflege',
@@ -246,13 +246,13 @@ const categoryDisplayLabel: Record<Category | 'Alle', string> = {
 // ---------------------------------------------------------------------------
 
 const aiMockResponses: Record<string, string> = {
-  cpap: 'CPAP ist eine Atemhilfe, die wie ein sanfter Wind funktioniert. Stellen Sie sich vor, Sie pusten leicht in einen Luftballon, damit er nicht zusammenfaellt -- genauso haelt CPAP die kleinen Lungenblaeschen Ihres Babys offen. Ihr Baby atmet selbstaendig, bekommt aber Unterstuetzung dabei. Die meisten Fruehchen brauchen das nur fuer eine begrenzte Zeit.',
-  apnoe: 'Atempausen klingen beaengstigend, sind aber bei Fruehchen sehr haeufig. Das Atemzentrum im Gehirn ist einfach noch unreif -- wie ein Anfaenger, der noch ueben muss. Die Monitore erkennen jede Pause sofort. Mit der Zeit wird das immer seltener, versprochen!',
-  bradykardie: 'Ein "Brady" bedeutet, dass das Herz kurz langsamer schlaegt. Das passiert oft, wenn das Baby auch kurz aufhoert zu atmen. Es klingt der Alarm, aber bleiben Sie ruhig: Meistens erholt sich Ihr Baby innerhalb weniger Sekunden. Die Pflegekraefte kennen das gut.',
+  cpap: 'CPAP ist eine Atemhilfe, die wie ein sanfter Wind funktioniert. Stellen Sie sich vor, Sie pusten leicht in einen Luftballon, damit er nicht zusammenfällt — genauso hält CPAP die kleinen Lungenbläschen Ihres Babys offen. Ihr Baby atmet selbständig, bekommt aber Unterstützung dabei. Die meisten Frühchen brauchen das nur für eine begrenzte Zeit.',
+  apnoe: 'Atempausen klingen beängstigend, sind aber bei Frühchen sehr häufig. Das Atemzentrum im Gehirn ist einfach noch unreif — wie ein Anfänger, der noch üben muss. Die Monitore erkennen jede Pause sofort. Mit der Zeit wird das immer seltener, versprochen!',
+  bradykardie: 'Ein «Brady» bedeutet, dass das Herz kurz langsamer schlägt. Das passiert oft, wenn das Baby auch kurz aufhört zu atmen. Es klingt der Alarm, aber bleiben Sie ruhig: Meistens erholt sich Ihr Baby innerhalb weniger Sekunden. Die Pflegekräfte kennen das gut.',
 };
 
 const defaultAiResponse =
-  'Das ist ein wichtiger medizinischer Begriff auf der Neonatologie. Sprechen Sie gerne mit Ihrem Aerzteteam darueber -- sie erklaeren Ihnen alles in Ruhe und beantworten Ihre Fragen. Sie sind nicht allein!';
+  'Das ist ein wichtiger medizinischer Begriff auf der Neonatologie. Sprechen Sie gerne mit Ihrem Ärzteteam darüber — sie erklären Ihnen alles in Ruhe und beantworten Ihre Fragen. Sie sind nicht allein!';
 
 // ---------------------------------------------------------------------------
 // Framer Motion variants
@@ -348,7 +348,7 @@ export default function GlossaryPage() {
       {/* ---- Header ---- */}
       <PageHeader
         title="Glossar"
-        subtitle="Medizinische Fachbegriffe einfach erklaert"
+        subtitle="Medizinische Fachbegriffe einfach erklärt"
       />
 
       {/* ---- AI Explain banner ---- */}
@@ -365,7 +365,7 @@ export default function GlossaryPage() {
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-gray-900 text-sm">Frag die AI</p>
               <p className="text-xs text-gray-500">
-                Tippen Sie bei einem Begriff auf das Sternsymbol fuer eine einfache Erklaerung
+                Tippen Sie bei einem Begriff auf das Sternsymbol für eine einfache Erklärung
               </p>
             </div>
           </div>
@@ -427,7 +427,7 @@ export default function GlossaryPage() {
             </div>
             <p className="text-gray-500 font-medium">Kein Begriff gefunden</p>
             <p className="text-sm text-gray-400 mt-1">
-              Versuchen Sie einen anderen Suchbegriff oder waehlen Sie eine andere Kategorie
+              Versuchen Sie einen anderen Suchbegriff oder wählen Sie eine andere Kategorie
             </p>
           </motion.div>
         )}
@@ -493,7 +493,7 @@ export default function GlossaryPage() {
                           <button
                             onClick={() => showAudioToast()}
                             className="w-8 h-8 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
-                            title="Aussprache anhoeren"
+                            title="Aussprache anhören"
                           >
                             <Icon name="Volume2" size={15} />
                           </button>
@@ -511,7 +511,7 @@ export default function GlossaryPage() {
                         </div>
                       </div>
 
-                      {/* Einfach erklaert toggle */}
+                      {/* Einfach erklärt toggle */}
                       <div className="mt-3">
                         <button
                           onClick={() => toggleExpand(term.id)}
@@ -524,7 +524,7 @@ export default function GlossaryPage() {
                           >
                             <Icon name="ChevronRight" size={16} />
                           </motion.span>
-                          Einfach erklaert
+                          Einfach erklärt
                         </button>
 
                         <AnimatePresence initial={false}>
@@ -572,7 +572,7 @@ export default function GlossaryPage() {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <p className="text-xs font-semibold text-violet-600 mb-1">
-                                    AI-Erklaerung
+                                    AI-Erklärung
                                   </p>
                                   <p className="text-sm text-gray-700 leading-relaxed">
                                     {aiMockResponses[term.id] ?? defaultAiResponse}

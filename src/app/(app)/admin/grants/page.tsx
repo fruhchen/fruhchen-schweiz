@@ -58,31 +58,31 @@ const initialGrants: Grant[] = [
     deadline: '2025-01-15',
     nextAction: 'Abschlussbericht einreichen',
     lastContact: '2025-01-02',
-    notes: 'Foerderzusage fuer Peer-Support-Ausbau erhalten. Bericht bis Q1.',
+    notes: 'Förderzusage für Peer-Support-Ausbau erhalten. Bericht bis Q1.',
     stage: 'bewilligt',
   },
   {
     id: '2',
-    foundation: 'Glueckskette',
+    foundation: 'Glückskette',
     contactPerson: 'Marc Dupont',
     email: 'm.dupont@glueckskette.ch',
     amount: 25000,
     deadline: '2025-02-15',
-    nextAction: 'Rueckfragen beantworten',
+    nextAction: 'Rückfragen beantworten',
     lastContact: '2025-01-20',
-    notes: 'Antrag fuer regionale Elterngruppen eingereicht. Deadline fuer Antwort in 2 Wochen.',
+    notes: 'Antrag für regionale Elterngruppen eingereicht. Deadline für Antwort in 2 Wochen.',
     stage: 'eingereicht',
   },
   {
     id: '3',
-    foundation: 'Ernst Goehner Stiftung',
-    contactPerson: 'Dr. Lukas Baer',
+    foundation: 'Ernst Göhner Stiftung',
+    contactPerson: 'Dr. Lukas Bär',
     email: 'l.baer@goehner-stiftung.ch',
     amount: 10000,
     deadline: '2025-03-31',
     nextAction: 'Antrag fertigstellen und einreichen',
     lastContact: '2025-01-10',
-    notes: 'Erstes Gespraech positiv verlaufen. Interesse an NEO-Box-Finanzierung.',
+    notes: 'Erstes Gespräch positiv verlaufen. Interesse an NEO-Box-Finanzierung.',
     stage: 'kontakt',
   },
   {
@@ -94,7 +94,7 @@ const initialGrants: Grant[] = [
     deadline: null,
     nextAction: 'Kontaktperson identifizieren',
     lastContact: '',
-    notes: 'Foerdert Projekte im Bereich Gesundheitskompetenz. Recherche zu passenden Programmen.',
+    notes: 'Fördert Projekte im Bereich Gesundheitskompetenz. Recherche zu passenden Programmen.',
     stage: 'recherche',
   },
   {
@@ -106,7 +106,7 @@ const initialGrants: Grant[] = [
     deadline: '2025-02-28',
     nextAction: 'Wirkungsbericht nachliefern',
     lastContact: '2025-01-18',
-    notes: 'Grossantrag fuer digitale Plattform-Entwicklung. Positive Vorsignale.',
+    notes: 'Grossantrag für digitale Plattform-Entwicklung. Positive Vorsignale.',
     stage: 'eingereicht',
   },
   {
@@ -118,7 +118,7 @@ const initialGrants: Grant[] = [
     deadline: '2025-04-15',
     nextAction: 'Detailkonzept senden',
     lastContact: '2025-01-05',
-    notes: 'Interesse an Nachsorge-Programm geaeussert. Termin fuer Praesentaiton vereinbaren.',
+    notes: 'Interesse an Nachsorge-Programm geäussert. Termin für Präsentation vereinbaren.',
     stage: 'kontakt',
   },
   {
@@ -128,9 +128,9 @@ const initialGrants: Grant[] = [
     email: '',
     amount: null,
     deadline: null,
-    nextAction: 'Foerderrichtlinien pruefen',
+    nextAction: 'Förderrichtlinien prüfen',
     lastContact: '',
-    notes: 'Foerdert Bildungs- und Integrationsprojekte. Passung evaluieren.',
+    notes: 'Fördert Bildungs- und Integrationsprojekte. Passung evaluieren.',
     stage: 'recherche',
   },
   {
@@ -142,19 +142,19 @@ const initialGrants: Grant[] = [
     deadline: null,
     nextAction: 'Erste Anfrage senden',
     lastContact: '',
-    notes: 'Regional Basel. Pruefen ob Fruehchen-Projekt passt.',
+    notes: 'Regional Basel. Prüfen ob Frühchen-Projekt passt.',
     stage: 'recherche',
   },
   {
     id: '9',
-    foundation: 'Stiftung fuer Kindergesundheit',
+    foundation: 'Stiftung für Kindergesundheit',
     contactPerson: 'Dr. Eva Brunner',
     email: 'e.brunner@kindergesundheit.ch',
     amount: 8000,
     deadline: '2025-03-01',
-    nextAction: 'Antrag ueberarbeiten und erneut einreichen',
+    nextAction: 'Antrag überarbeiten und erneut einreichen',
     lastContact: '2024-12-15',
-    notes: 'Erstantrag abgelehnt wegen formaler Maengel. Feedback erhalten, Ueberarbeitung geplant.',
+    notes: 'Erstantrag abgelehnt wegen formaler Mängel. Feedback erhalten, Überarbeitung geplant.',
     stage: 'abgelehnt',
   },
   {
@@ -164,9 +164,9 @@ const initialGrants: Grant[] = [
     email: 'c.huber@avina.ch',
     amount: 30000,
     deadline: '2025-03-15',
-    nextAction: 'Praesentation vorbereiten',
+    nextAction: 'Präsentation vorbereiten',
     lastContact: '2025-01-22',
-    notes: 'Einladung zur muendlichen Praesentation am 12.02. Gutes Zeichen.',
+    notes: 'Einladung zur mündlichen Präsentation am 12.02. Gutes Zeichen.',
     stage: 'eingereicht',
   },
 ];
@@ -313,7 +313,7 @@ export default function GrantsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Grants & Stiftungen"
-        subtitle="Kanban-Board fuer die Stiftungs-Pipeline"
+        subtitle="Kanban-Board für die Stiftungs-Pipeline"
         action={
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-4 text-sm text-gray-500 mr-2">
@@ -417,16 +417,16 @@ export default function GrantsPage() {
                               size={12}
                             />
                             {days !== null && days < 0
-                              ? `${Math.abs(days)} Tage ueberfaellig`
+                              ? `${Math.abs(days)} Tage überfällig`
                               : days !== null && days === 0
-                              ? 'Heute faellig'
+                              ? 'Heute fällig'
                               : `${days} Tage verbleibend`}
                           </div>
                         )}
 
                         {/* Next action */}
                         <p className="text-xs text-gray-500 leading-relaxed mb-2">
-                          <span className="font-medium text-gray-600">Naechster Schritt:</span>{' '}
+                          <span className="font-medium text-gray-600">Nächster Schritt:</span>{' '}
                           {grant.nextAction}
                         </p>
 
@@ -534,7 +534,7 @@ export default function GrantsPage() {
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Naechster Schritt
+                  Nächster Schritt
                 </p>
                 <p className="text-sm text-gray-900 font-medium">
                   {selectedGrant.nextAction}
@@ -655,7 +655,7 @@ export default function GrantsPage() {
           </div>
 
           <Input
-            label="Naechster Schritt"
+            label="Nächster Schritt"
             placeholder="z.B. Erstanfrage senden"
             icon="ArrowRight"
             value={formData.nextAction}
@@ -664,7 +664,7 @@ export default function GrantsPage() {
 
           <Textarea
             label="Notizen"
-            placeholder="Zusaetzliche Informationen, interne Bemerkungen..."
+            placeholder="Zusätzliche Informationen, interne Bemerkungen..."
             value={formData.notes}
             onChange={(e) => handleFormChange('notes', e.target.value)}
           />
@@ -684,7 +684,7 @@ export default function GrantsPage() {
               onClick={handleAddGrant}
               disabled={!formData.foundation.trim()}
             >
-              Grant hinzufuegen
+              Grant hinzufügen
             </Button>
           </div>
         </div>

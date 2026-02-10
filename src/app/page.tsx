@@ -102,7 +102,7 @@ const features = [
   {
     icon: 'ClipboardCheck' as const,
     title: 'Nachsorge',
-    description: 'Checklisten und Termine fuer die Zeit nach dem Spitalaufenthalt.',
+    description: 'Checklisten und Termine für die Zeit nach dem Spitalaufenthalt.',
     accent: 'amber',
     bg: 'bg-amber-50',
     iconColor: 'text-amber-500',
@@ -111,7 +111,7 @@ const features = [
   {
     icon: 'Package' as const,
     title: 'NEO Box',
-    description: 'Die liebevoll zusammengestellte Willkommensbox fuer Fruehchen-Familien.',
+    description: 'Die liebevoll zusammengestellte Willkommensbox für Frühchen-Familien.',
     accent: 'pink',
     bg: 'bg-pink-50',
     iconColor: 'text-pink-500',
@@ -123,19 +123,19 @@ const steps = [
   {
     number: '1',
     title: 'QR Code scannen',
-    description: 'Im Spital oder auf unserer Website den QR Code scannen und die App sofort oeffnen.',
+    description: 'Im Spital oder auf unserer Website den QR Code scannen und die App sofort öffnen.',
     icon: 'ScanLine' as const,
   },
   {
     number: '2',
     title: 'Registrieren',
-    description: 'Ein kurzes Profil erstellen, eure Region waehlen und schon seid ihr dabei.',
+    description: 'Ein kurzes Profil erstellen, eure Region wählen und schon seid ihr dabei.',
     icon: 'UserPlus' as const,
   },
   {
     number: '3',
     title: 'Sofort loslegen',
-    description: 'Tagebuch fuehren, Glossar entdecken, Peer-Eltern kennenlernen und vieles mehr.',
+    description: 'Tagebuch führen, Glossar entdecken, Peer-Eltern kennenlernen und vieles mehr.',
     icon: 'Rocket' as const,
   },
 ];
@@ -147,6 +147,23 @@ const steps = [
 export default function LandingPage() {
   return (
     <div className="min-h-screen overflow-x-hidden">
+      {/* ------------------------------------------------------------------ */}
+      {/*  Top nav with logo                                                  */}
+      {/* ------------------------------------------------------------------ */}
+      <nav className="absolute top-0 left-0 right-0 z-30 px-6 py-4">
+        <div className="mx-auto max-w-6xl flex items-center justify-between">
+          <img src="/fruhchen_neokinder_logo.svg" alt="Frühchen & Neokinder Schweiz" className="h-10 md:h-14 w-auto" />
+          <div className="flex items-center gap-3">
+            <Link href="/login">
+              <Button variant="ghost" size="sm">Anmelden</Button>
+            </Link>
+            <Link href="/register">
+              <Button size="sm">Registrieren</Button>
+            </Link>
+          </div>
+        </div>
+      </nav>
+
       {/* ------------------------------------------------------------------ */}
       {/*  Hero                                                               */}
       {/* ------------------------------------------------------------------ */}
@@ -169,7 +186,7 @@ export default function LandingPage() {
           >
             <Icon name="Heart" size={16} className="text-rose-500" />
             <span className="text-sm font-medium text-gray-700">
-              Fuer Fruehchen-Familien in der Schweiz
+              Für Frühchen-Familien in der Schweiz
             </span>
           </motion.div>
 
@@ -182,7 +199,7 @@ export default function LandingPage() {
           >
             <span className="text-gradient-warm">Gemeinsam stark</span>
             <br />
-            <span className="text-gray-800">fuer die Kleinsten</span>
+            <span className="text-gray-800">für die Kleinsten</span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -192,8 +209,8 @@ export default function LandingPage() {
             transition={{ duration: 0.6, delay: 0.35 }}
             className="mx-auto mt-6 max-w-2xl text-lg md:text-xl text-gray-500 leading-relaxed text-balance"
           >
-            Die digitale Begleitung fuer Familien mit Fruehgeborenen und Neokindern.
-            Wissen, Austausch und Unterstuetzung — alles in einer App.
+            Die digitale Begleitung für Familien mit Frühgeborenen und Neokindern.
+            Wissen, Austausch und Unterstützung — alles in einer App.
           </motion.p>
 
           {/* CTAs */}
@@ -335,7 +352,7 @@ export default function LandingPage() {
               In drei Schritten dabei
             </h2>
             <p className="mt-4 mx-auto max-w-lg text-gray-500">
-              Kein App Store noetig. Einfach oeffnen, registrieren und loslegen.
+              Kein App Store nötig. Einfach öffnen, registrieren und loslegen.
             </p>
           </motion.div>
 
@@ -399,9 +416,9 @@ export default function LandingPage() {
               <Icon name="Quote" size={32} className="mx-auto mb-6 text-brand-300" />
 
               <blockquote className="text-xl md:text-2xl text-gray-700 leading-relaxed font-medium text-balance">
-                Als unser Sohn in der 28. Woche kam, waren wir voellig ueberwaeltigt.
+                Als unser Sohn in der 28. Woche kam, waren wir völlig überwältigt.
                 Diese App hat uns Halt gegeben — das Tagebuch, die Peer-Eltern, einfach
-                zu wissen, dass wir nicht allein sind. Dafuer sind wir unendlich dankbar.
+                zu wissen, dass wir nicht allein sind. Dafür sind wir unendlich dankbar.
               </blockquote>
 
               <div className="mt-8 flex items-center justify-center gap-3">
@@ -440,10 +457,10 @@ export default function LandingPage() {
             </div>
 
             <h2 className="text-display-sm md:text-display text-gray-900 font-display text-balance">
-              Bereit fuer den naechsten Schritt?
+              Bereit für den nächsten Schritt?
             </h2>
             <p className="mt-4 text-lg text-gray-500 leading-relaxed">
-              Tretet unserer Community bei und erfahrt, wie wir Fruehchen-Familien
+              Tretet unserer Community bei und erfahrt, wie wir Frühchen-Familien
               in der ganzen Schweiz begleiten.
             </p>
 
@@ -471,21 +488,13 @@ export default function LandingPage() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             {/* Branding */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center shadow-md shadow-brand-500/20">
-                <Icon name="Heart" size={20} className="text-white" />
-              </div>
-              <div>
-                <p className="font-display font-semibold text-gray-900">
-                  Fruehchen &amp; Neokinder Schweiz
-                </p>
-                <p className="text-xs text-gray-500">Gemeinsam stark</p>
-              </div>
+              <img src="/fruhchen_neokinder_logo.svg" alt="Frühchen & Neokinder Schweiz" className="h-12 w-auto" />
             </div>
 
             {/* Links */}
             <nav className="flex items-center gap-6 text-sm text-gray-500">
               <Link href="/about" className="hover:text-brand-500 transition-colors">
-                Ueber uns
+                Über uns
               </Link>
               <Link href="/privacy" className="hover:text-brand-500 transition-colors">
                 Datenschutz
@@ -501,7 +510,7 @@ export default function LandingPage() {
 
           <div className="mt-8 pt-6 border-t border-gray-100 text-center">
             <p className="text-sm text-gray-400">
-              &copy; {new Date().getFullYear()} Fruehchen &amp; Neokinder Schweiz. Alle Rechte vorbehalten.
+              &copy; {new Date().getFullYear()} Frühchen &amp; Neokinder Schweiz. Alle Rechte vorbehalten.
             </p>
           </div>
         </div>
